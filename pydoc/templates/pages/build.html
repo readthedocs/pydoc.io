@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load core_tags %}
+
+{% block content %}
+{% filter restructuredtext %}
+
+Docs now building!
+{{ view.build }}
+
+{% endfilter %}
+{% endblock content %}

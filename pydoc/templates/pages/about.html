@@ -1,1 +1,31 @@
 {% extends "base.html" %}
+{% load core_tags %}
+
+{% block content %}
+{% filter restructuredtext %}
+
+About Pydoc
+-----------
+
+Thanks for checking out Pydoc.
+This is a new ambitious project from the folks behind Read the Docs.
+
+Our plan is to build auto-generated API documentation for every package that is uploaded to PyPI.
+This is similar to projects like http://rubydoc.info/ and https://godoc.org/ -- but for the Python community.
+Once we have gotten all package in PyPI,
+we hope to expand it to GitHub packages as well.
+
+The primary thing that needed to happen for this project was the ability to parse Python documentation without importing the project.
+Most Python tooling requires being able to import the project,
+which is bad for a few reasons:
+
+* It means you need to have all dependencies (including C libraries) installed on your system
+* It executes arbitrary code
+* It uses a lot more memory than a parse-only solution
+
+**This is currently in Beta!**
+There is a lot of work that still needs to be done,
+especially around the documentation UX and parsing.
+
+{% endfilter %}
+{% endblock content %}

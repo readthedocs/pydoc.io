@@ -14,6 +14,7 @@ import environ
 
 ROOT_DIR = environ.Path(__file__) - 3  # (pydoc/config/settings/common.py - 3 = pydoc/)
 APPS_DIR = ROOT_DIR.path('pydoc')
+DOCS_DIR = APPS_DIR.path('media', 'docs')
 
 env = environ.Env()
 
@@ -34,6 +35,7 @@ DJANGO_APPS = (
     # Admin
     'django.contrib.admin',
 )
+
 THIRD_PARTY_APPS = (
     'crispy_forms',  # Form layouts
     'allauth',  # registration
@@ -45,7 +47,7 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     # custom users app
     'pydoc.users.apps.UsersConfig',
-    # Your stuff: custom apps go here
+    'pydoc.core',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -262,3 +264,17 @@ ADMIN_URL = r'^admin/'
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+
+RESTRUCTUREDTEXT_FILTER_SETTINGS = {
+    'cloak_email_addresses': True,
+    'file_insertion_enabled': False,
+    'raw_enabled': False,
+    'strip_comments': True,
+    'doctitle_xform': True,
+    'sectsubtitle_xform': True,
+    'initial_header_level': 2,
+    'report_level': 5,
+    'syntax_highlight': 'none',
+    'math_output': 'latex',
+    'field_name_limit': 50,
+}
