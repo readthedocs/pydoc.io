@@ -18,12 +18,13 @@ def get_package(package, create=False):
     """
     returns a package or none if it does not exist.
     """
+    index = PackageIndex.objects.first()
     if isinstance(package, basestring):
         if create:
-            package = Package.objects.get_or_create(name=package)[0]
+            package = Package.objects.get_or_create(index=index, name=package)[0]
         else:
             try:
-                package = Package.objects.get(name=package)
+                package = Package.objects.get(index=index, name=package)
             except Package.DoesNotExist:
                 package = None
     return package
@@ -65,6 +66,7 @@ def create_or_update_release(package, release,
             return
         release, created = Release.objects.get_or_create(package=package,
                                                          version=release)
+        print('Updated release %s for %s' % (release.version, package.name))
     data = client.release_data(package.name, release.version)
     release.hidden = data.get('_pypi_hidden', False)
     for key, value in data.items():
@@ -105,6 +107,7 @@ def process_changelog(since, update_releases=True,
     for item in client.changelog(timestamp):
         packages[item[0]] = True
     for package in packages.keys():
+        print('Updating %s' % package)
         update_package(package, create=True,
                        update_releases=update_releases,
                        update_distributions=update_distributions,

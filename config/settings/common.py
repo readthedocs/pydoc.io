@@ -17,6 +17,7 @@ APPS_DIR = ROOT_DIR.path('pydoc')
 DOCS_DIR = APPS_DIR.path('media', 'docs')
 
 env = environ.Env()
+env.read_env()
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
