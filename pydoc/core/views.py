@@ -9,10 +9,10 @@ class HomeView(TemplateView):
 
     def projects(self):
         return [
-            {
-                'name': 'Django',
-                'version': '1.9',
-            },
+            # {
+            #     'name': 'Django',
+            #     'version': '1.9',
+            # },
             {
                 'name': 'requests',
                 'version': '2.9.2',
