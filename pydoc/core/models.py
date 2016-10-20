@@ -17,8 +17,8 @@ try:
 except NameError:
     basestring = str
 
-PYPI_API_URL = 'http://pypi.python.org/pypi'
-PYPI_SIMPLE_URL = 'http://pypi.python.org/simple'
+PYPI_API_URL = 'https://pypi.python.org/pypi'
+PYPI_SIMPLE_URL = 'https://pypi.python.org/simple'
 MIRROR_FILETYPES = ['*.zip', '*.tgz', '*.egg', '*.tar.gz', '*.tar.bz2']
 
 

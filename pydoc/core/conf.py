@@ -106,7 +106,7 @@ XMLRPC_COMMANDS = {
 to another index, http://pypi.python.org/ by default. This feature is disabled 
 by default and can be enabled by setting packageindex_PROXY_MISSING to True in 
 your settings file. """
-PROXY_BASE_URL = 'http://pypi.python.org/simple'
+PROXY_BASE_URL = 'https://pypi.python.org/simple'
 
 PROXY_MISSING = False
 
