@@ -65,6 +65,7 @@ def create_or_update_release(package, release,
         if not len(release) <= 128:
             # TODO: more general validation and save to statistics
             return
+        print('Creating release %s:%s' % (package, release))
         release, created = Release.objects.get_or_create(package=package,
                                                          version=release)
         print('Updated release %s for %s' % (release.version, package.name))

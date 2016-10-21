@@ -22,7 +22,7 @@ You can check out our listing of current projects that we're building here:
 {% for project in view.projects %}
 {% filter restructuredtext %}
 
-* `{{ project.name }} </pypi/{{ project.name }}-{{ project.version }}/index.html>`_
+* `{{ project }} </pypi/{{ project }}/index.html>`_
 
 {% endfilter %}
 {% endfor %}

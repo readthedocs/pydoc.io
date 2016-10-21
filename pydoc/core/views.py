@@ -1,4 +1,7 @@
+import os
+
 from django.views.generic import TemplateView
+from django.conf import settings
 
 from pydoc.taskapp.celery import build
 
@@ -8,16 +11,7 @@ class HomeView(TemplateView):
     title = "Pydoc Home"
 
     def projects(self):
-        return [
-            # {
-            #     'name': 'Django',
-            #     'version': '1.9',
-            # },
-            {
-                'name': 'requests',
-                'version': '2.9.2',
-            },
-        ]
+        return [proj for proj in os.listdir(str(settings.DOCS_DIR))]
 
 
 class BuildView(TemplateView):
