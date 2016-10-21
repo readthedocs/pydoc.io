@@ -30,7 +30,7 @@ class Classifier(models.Model):
         verbose_name_plural = _(u"classifiers")
         ordering = ('name',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -49,7 +49,7 @@ class PackageIndex(models.Model):
     class Meta:
         verbose_name_plural = 'package indexes'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.slug
 
     @property
@@ -87,7 +87,7 @@ class Package(models.Model):
         get_latest_by = "releases__latest"
         ordering = ['name', ]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @models.permalink
@@ -153,7 +153,7 @@ class Release(models.Model):
         get_latest_by = 'created'
         ordering = ['-created']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.release_name
 
     @property
@@ -237,7 +237,7 @@ class Distribution(models.Model):
         verbose_name_plural = _(u"distributions")
         unique_together = ("release", "filetype", "pyversion")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.filename
 
     def get_absolute_url(self):

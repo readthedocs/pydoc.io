@@ -60,7 +60,7 @@ def create_or_update_release(package, release,
                              update_distributions=False,
                              mirror_distributions=False):
     client = xmlrpc.client.ServerProxy(PYPI_API_URL)
-    package = get_package(package)
+    package = get_package(package, create=True)
     if isinstance(release, basestring):
         if not len(release) <= 128:
             # TODO: more general validation and save to statistics
