@@ -5,7 +5,7 @@ pypi.
 
 import sys
 from django.core.management.base import BaseCommand
-from pydoc.core.tasks import build
+from pydoc.taskapp.celery import build
 from pydoc.core.pypi import create_or_update_release
 
 
