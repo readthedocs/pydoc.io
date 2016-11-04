@@ -1,11 +1,26 @@
 {% extends "base.html" %}
 {% load core_tags %}
+{% load crispy_forms_tags %}
+
 
 {% block content %}
-{% filter restructuredtext %}
 
-Docs now building!
-{{ view.build }}
+{% if not success %}
 
-{% endfilter %}
+Build a new project
+
+<form method="POST" action=".">
+    <table>
+    {% csrf_token %}
+    {% crispy form %}
+    <input type="submit" />
+    </table>
+</form>
+
+{% else %}
+
+Successfully built {{ form.cleaned_data.project }}
+
+{% endif %}
+
 {% endblock content %}
