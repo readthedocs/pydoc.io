@@ -19,10 +19,10 @@ You can read more information in our `About <{% url 'about' %}>`_ page.
 You can check out our listing of current projects that we're building here:
 {% endfilter %}
 
-{% for project in view.projects %}
+{% for release in view.projects %}
 {% filter restructuredtext %}
 
-* `{{ project }} </pypi/{{ project }}/index.html>`_
+* `{{ release.release_name }} </pypi/{{ release.release_name }}/index.html>`_
 
 {% endfilter %}
 {% endfor %}

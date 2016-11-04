@@ -24,8 +24,8 @@ admin.site.register(PackageIndex, PackageIndexAdmin)
 class PackageReleaseInline(admin.TabularInline):
     model = Release
     extra = 0
-    fields = ('version', 'metadata_version', 'hidden',)
-    readonly_fields = ('version', 'metadata_version', 'hidden',)
+    fields = ('version', 'metadata_version', 'built',)
+    readonly_fields = ('version', 'metadata_version', 'built',)
 
 
 class PackageAdmin(admin.ModelAdmin):
@@ -44,9 +44,9 @@ class PackageAdmin(admin.ModelAdmin):
 
 
 class ReleaseAdmin(admin.ModelAdmin):
-    list_display = ('package', 'version', 'hidden', 'is_from_external',)
+    list_display = ('package', 'version', 'built', 'is_from_external',)
     search_fields = ('package__name', 'version',)
-    list_filter = ('hidden', 'is_from_external',)
+    list_filter = ('built', 'is_from_external',)
     raw_id_fields = ('package',)
 
 

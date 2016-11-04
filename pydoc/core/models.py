@@ -141,7 +141,7 @@ class Release(models.Model):
     version = models.CharField(max_length=128)
     metadata_version = models.CharField(max_length=64, default='1.0')
     package_info = JSONField(default=dict)
-    hidden = models.BooleanField(default=False)
+    built = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
 
     is_from_external = models.BooleanField(default=False)

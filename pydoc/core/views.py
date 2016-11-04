@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from django.conf import settings
 
 from pydoc.taskapp.celery import build
+from pydoc.core.models import Release
 
 
 class HomeView(TemplateView):
@@ -11,7 +12,7 @@ class HomeView(TemplateView):
     title = "Pydoc Home"
 
     def projects(self):
-        return [proj for proj in os.listdir(str(settings.DOCS_DIR))]
+        return Release.objects.filter(built=True)
 
 
 class BuildView(TemplateView):

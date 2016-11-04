@@ -99,6 +99,7 @@ def create_or_update_release(package, release,
                     setattr(distribution, key, value)
             # distribution.mirror_package(commit=False)
             distribution.save()
+    return release
 
 
 def process_changelog(since, update_releases=True,
