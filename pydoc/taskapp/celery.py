@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import os
 import tempfile
+from collections import defaultdict
 
 from celery import Celery
 from django.apps import apps, AppConfig
@@ -10,7 +11,6 @@ from django.template.loader import get_template
 import requests
 import urllib.request
 import zipfile
-
 
 if not settings.configured:
     # set the default Django settings module for the 'celery' program.
@@ -94,8 +94,27 @@ def _build_docs(project, version, project_url, project_filename):
         os.system(sphinx_command)
 
 
+def _get_highest_version(project):
+    # Get highest version
+    versions = defaultdict(list)
+    package_resp = requests.get(
+        'https://pypi.python.org/pypi/{name}/json'.format(name=project)
+    )
+    package_json = package_resp.json()
+    for version in package_json['releases']:
+        versions[project].append(version)
+    version = sorted(versions[project])[-1]
+    return version
+
+
 @app.task
-def build(project, version):
+def build(project, version=None):
+    from pydoc.core.pypi import create_or_update_release
+    if not version:
+        version = _get_highest_version(project)
+
+    release = create_or_update_release(project, version)
+
     project_resp = requests.get(
         'https://pypi.python.org/pypi/{project}/{version}/json'.format(
             project=project,
@@ -116,3 +135,5 @@ def build(project, version):
         return
 
     _build_docs(project, version, project_url, project_filename)
+    release.built = True
+    release.save()

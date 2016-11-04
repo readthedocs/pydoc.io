@@ -20,4 +20,5 @@ class BuildView(TemplateView):
     title = "Pydoc Build"
 
     def build(self):
-        build.delay(project='requests', version='2.9.2')
+        project = self.request.GET.get('project', 'requests')
+        build.delay(project=project)
