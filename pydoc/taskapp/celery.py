@@ -135,5 +135,9 @@ def build(project, version=None):
         return
 
     _build_docs(project, version, project_url, project_filename)
-    release.built = True
-    release.save()
+
+    directory_name = "{name}-{version}".format(name=project, version=version)
+    outdir = settings.DOCS_DIR.path(directory_name)
+    if os.path.exists(os.path.join(outdir.root, 'index.html')):
+        release.built = True
+        release.save()
