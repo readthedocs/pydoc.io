@@ -9,7 +9,7 @@ from pydoc.core.models import Package
 
 
 class Command(BaseCommand):
-    help = """Build docs from pip freeze output"""
+    help = """Build docs passed in."""
 
     def add_arguments(self, parser):
         parser.add_argument('args', nargs='*')
