@@ -8,8 +8,7 @@ from django.db import migrations
 def forwards_func(apps, schema_editor):
     # Add a default package index (Pypi)
     PackageIndex = apps.get_model("core", "PackageIndex")
-    db_alias = schema_editor.connection.alias
-    PackageIndex.using(db_alias).create()
+    PackageIndex.objects.create()
 
 
 class Migration(migrations.Migration):

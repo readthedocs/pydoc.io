@@ -11,7 +11,6 @@ from django.conf import settings
 from django.template.loader import get_template
 
 
-
 if not settings.configured:
     # set the default Django settings module for the 'celery' program.
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')  # pragma: no cover
