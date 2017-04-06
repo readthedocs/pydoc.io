@@ -4,13 +4,17 @@ Thanks to all those who contributed.
 """
 
 import xmlrpc
+import datetime
+import time
+
 from django.db import models
 from django.utils.datastructures import MultiValueDict
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.postgres.fields import JSONField
+
 from . import conf
-import datetime
-import time
+from .pypi import TIMEFORMAT
+
 
 try:
     basestring

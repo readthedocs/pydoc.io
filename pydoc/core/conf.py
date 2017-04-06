@@ -11,8 +11,11 @@ information, see http://docs.djangoproject.com/ """
 
 def distribution_upload_to(instance, filename):
     return os.path.join('dists', instance.release.package.name, filename)
+
+
 RELEASE_UPLOAD_TO = distribution_upload_to
-#RELEASE_UPLOAD_TO = 'dists'
+
+# RELEASE_UPLOAD_TO = 'dists'
 
 OS_NAMES = (
     ("aix", "AIX"),
@@ -87,9 +90,9 @@ METADATA_FORMS = {
 FALLBACK_VIEW = 'packageindex.views.releases.index'
 
 ACTION_VIEWS = {
-    "file_upload": 'packageindex.views.distutils.register_or_upload',  # ``sdist`` command
-    "submit": 'packageindex.views.distutils.register_or_upload',  # ``register`` command
-    "list_classifiers": 'packageindex.views.distutils.list_classifiers',  # ``list_classifiers`` command
+    "file_upload": 'packageindex.views.distutils.register_or_upload',
+    "submit": 'packageindex.views.distutils.register_or_upload',
+    "list_classifiers": 'packageindex.views.distutils.list_classifiers',
 }
 
 XMLRPC_COMMANDS = {
@@ -97,14 +100,11 @@ XMLRPC_COMMANDS = {
     'package_releases': 'packageindex.views.xmlrpc.package_releases',
     'release_urls': 'packageindex.views.xmlrpc.release_urls',
     'release_data': 'packageindex.views.xmlrpc.release_data',
-    #'search': xmlrpc.search, Not done yet
-    #'changelog': xmlrpc.changelog, Not done yet
-    #'ratings': xmlrpc.ratings, Not done yet
 }
 
-""" These settings enable proxying of packages that are not in the local index 
-to another index, http://pypi.python.org/ by default. This feature is disabled 
-by default and can be enabled by setting packageindex_PROXY_MISSING to True in 
+""" These settings enable proxying of packages that are not in the local index
+to another index, http://pypi.python.org/ by default. This feature is disabled
+by default and can be enabled by setting packageindex_PROXY_MISSING to True in
 your settings file. """
 PROXY_BASE_URL = 'https://pypi.python.org/simple'
 
