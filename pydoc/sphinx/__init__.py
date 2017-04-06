@@ -1,10 +1,29 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
 import os
 import environ
 import json
 import copy
+
+#  Whitelist keys that we want to output
+KEYS = [
+    u'body',
+    u'prev',
+    u'display_toc',
+    u'title',
+    u'sourcename',
+    u'customsidebar',
+    u'current_page_name',
+    u'next',
+    u'sidebars',
+    u'metatags',
+    u'meta',
+    u'parents',
+    u'rellinks',
+    u'toc',
+    u'alabaster_version',
+    u'page_source_suffix'
+]
 
 
 def update_body(app, pagename, templatename, context, doctree):
@@ -24,10 +43,9 @@ def update_body(app, pagename, templatename, context, doctree):
         out_file = json_dir.path(pagename + '.json')
         to_write = open(out_file(), 'w+')
         to_context = copy.deepcopy(context)
-        del to_context['hasdoc']
-        del to_context['pathto']
-        del to_context['toctree']
-        del to_context['rellinks']
+        for key in to_context:
+            if key not in KEYS:
+                del to_context[key]
         to_write.write(json.dumps(to_context, indent=4))
     except Exception as e:
         print('ERRRRRRRRR: ', e)
