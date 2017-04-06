@@ -19,7 +19,6 @@ KEYS = [
     u'metatags',
     u'meta',
     u'parents',
-    u'rellinks',
     u'toc',
     u'alabaster_version',
     u'page_source_suffix'
@@ -43,7 +42,8 @@ def update_body(app, pagename, templatename, context, doctree):
         out_file = json_dir.path(pagename + '.json')
         to_write = open(out_file(), 'w+')
         to_context = copy.deepcopy(context)
-        for key in to_context:
+        # Use list here so we don't get an error on changing dict during iteration
+        for key in list(context):
             if key not in KEYS:
                 del to_context[key]
         to_write.write(json.dumps(to_context, indent=4))
