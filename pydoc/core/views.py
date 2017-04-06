@@ -4,12 +4,12 @@ from django.views import View
 
 from django import forms
 
-from pydoc.core.utils import handle_build
-from pydoc.core.models import Release
+from pydoc.core.utils import handle_build, get_highest_version, update_package
+from pydoc.core.models import Release, Distribution
 
 
 class BuildForm(forms.Form):
-    project = forms.CharField(label='Project', max_length=100)
+    package = forms.CharField(label='Package', max_length=100)
 
 
 class HomeView(TemplateView):
@@ -33,9 +33,20 @@ class BuildView(View):
         form = self.form_class(request.POST)
         success = False
         if form.is_valid():
-            project = form.cleaned_data['project']
-            handle_build(packages=[project], latest=True)
-            success = True
+            tried = True
+            package = form.cleaned_data['package']
+            version = get_highest_version(package)
+            update_package(package)
+            dists = Distribution.objects.filter(
+                release__package__name=package,
+                release__version=version,
+                filetype='bdist_wheel'
+            )
+            if dists.exists():
+                success = True
+                handle_build(packages=[package], latest=True)
+            else:
+                success = False
         return render(request, self.template_name, {
-            'form': form, 'success': success
+            'form': form, 'success': success, 'tried': tried
         })

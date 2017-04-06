@@ -5,9 +5,8 @@
 
 {% block content %}
 
-{% if not success %}
 
-Build a new project
+Build a new package
 
 <form method="POST" action=".">
     <table>
@@ -17,9 +16,13 @@ Build a new project
     </table>
 </form>
 
-{% else %}
+{% if success %}
 
-Successfully built {{ form.cleaned_data.project }}
+Successfully built {{ form.cleaned_data.package }}
+
+{% elif tried %}
+
+No wheel found for {{ form.cleaned_data.package }}.
 
 {% endif %}
 

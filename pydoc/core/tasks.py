@@ -2,8 +2,6 @@ from __future__ import absolute_import
 
 import os
 import tempfile
-from collections import defaultdict
-import requests
 import urllib.request
 import zipfile
 
@@ -11,6 +9,7 @@ from celery import Celery
 from django.apps import apps, AppConfig
 from django.conf import settings
 from django.template.loader import get_template
+
 
 
 if not settings.configured:
@@ -88,24 +87,12 @@ def _build_docs(project, version, project_url, project_filename):
         os.system(sphinx_command)
 
 
-def _get_highest_version(project):
-    # Get highest version
-    versions = defaultdict(list)
-    package_resp = requests.get(
-        'https://pypi.python.org/pypi/{name}/json'.format(name=project)
-    )
-    package_json = package_resp.json()
-    for version in package_json['releases']:
-        versions[project].append(version)
-    version = sorted(versions[project])[-1]
-    return version
-
-
 @app.task
 def build(project, version=None):
+    from .utils import get_highest_version
     from .models import Release
     if not version:
-        version = _get_highest_version(project)
+        version = get_highest_version(project)
 
     release = Release.objects.get(package__name=project, version=version)
     try:

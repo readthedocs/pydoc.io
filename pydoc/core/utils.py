@@ -6,7 +6,6 @@ import xmlrpc.client
 
 import requests
 
-from .tasks import build
 from .models import Package, Release, Distribution, PackageIndex
 
 PYPI_API_URL = 'https://pypi.python.org/pypi'
@@ -16,6 +15,20 @@ try:
     basestring
 except NameError:
     basestring = str
+
+
+def get_highest_version(package, data=None):
+    # Get highest version
+    versions = []
+    if not data:
+        package_resp = requests.get(
+            'https://pypi.python.org/pypi/{name}/json'.format(name=package)
+        )
+        data = package_resp.json()
+    for version in data['releases']:
+        versions.append(version)
+    version = sorted(versions)[-1]
+    return version
 
 
 def get_package(package, create=False):
@@ -51,7 +64,7 @@ def get_package_json(package):
 
 
 def handle_build(packages, latest=False, built=True):
-    from pydoc.core.utils import update_package
+    from .tasks import build
 
     if packages:
         queryset = Package.objects.filter(name__in=packages)
@@ -72,8 +85,7 @@ def handle_build(packages, latest=False, built=True):
         for package in queryset:
             qs = package.releases.all()
             if built:
-                qs.filter(built=True)
-
+                qs = qs.filter(built=True)
             for release in qs:
                 print("updating %s:%s" % (package, release))
                 build.delay(project=release.package.name, version=release.version)
@@ -84,12 +96,6 @@ def update_package_list(url=None):
     for package_name in index.client.list_packages():
         print('Adding %s' % package_name)
         package, created = Package.objects.get_or_create(index=index, name=package_name.lower())
-
-
-def update_packages(package_names=None):
-    package_names = package_names or []
-    for package_name in package_names:
-        update_package(package_name)
 
 
 def update_package(package, create=False, update_releases=True,
