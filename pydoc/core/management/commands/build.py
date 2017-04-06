@@ -20,6 +20,7 @@ class Command(BaseCommand):
             for release in package.releases.filter(built=True):
                 print("updating %s:%s" % (package, release))
                 build.delay(project=release.package.name, version=release.version)
+            break
         else:
             for package in Package.objects.filter(releases__built=True):
                 for release in package.releases.filter(built=True):
