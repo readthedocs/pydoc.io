@@ -61,6 +61,5 @@ node_modules/
 # User-uploaded media
 pydoc/media/
 
-
-
-
+# Local settings overries
+pydoc/settings/local_settings.py

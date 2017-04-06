@@ -75,5 +75,8 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 CELERY_ALWAYS_EAGER = True
 ########## END CELERY
 
-# Your local stuff: Below this line define 3rd party library settings
-# ------------------------------------------------------------------------------
+try:
+    # pylint: disable=unused-wildcard-import
+    from .local_settings import *  # noqa
+except ImportError:
+    pass
