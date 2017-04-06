@@ -5,7 +5,7 @@ pypi.
 
 from django.core.management.base import BaseCommand
 from pydoc.core.models import Package
-from pydoc.core.utils import update_package
+from pydoc.core.utils import update_package, thread_update
 
 
 class Command(BaseCommand):
@@ -19,15 +19,13 @@ class Command(BaseCommand):
         if not args:
             # update all packages! using iterator() because querysets get cahced
             # and we access files in the loop. they use a lot of ram.
-            for package in Package.objects.all().iterator():
-                print("updating <%s>" % package.name)
-                update_package(package=package, update_releases=True,
-                               update_distributions=True, mirror_distributions=False)
+            queryset = Package.objects.all().iterator()
+            thread_update(queryset=queryset, task=update_package)
         for package_name in args:
             try:
                 package = Package.objects.get(name=package_name)
                 print("updating <%s>" % package.name)
                 update_package(package=package, update_releases=True,
-                               update_distributions=True, mirror_distributions=False)
+                               update_distributions=True)
             except Package.DoesNotExist:
                 print("package <%s> does not exist in local database" % package_name)

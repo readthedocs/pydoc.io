@@ -4,7 +4,8 @@ pypi.
 """
 
 from django.core.management.base import BaseCommand
-from pydoc.core.utils import process_changelog
+from pydoc.core.utils import process_changelog, update_package, thread_update
+from pydoc.core.models import Package
 import datetime
 
 
@@ -14,6 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         since = datetime.datetime.utcnow() - datetime.timedelta(days=1)
         print("updating change from pypi since %s" % since)
-        process_changelog(since,
-                          update_releases=True, update_distributions=True,
-                          mirror_distributions=False)
+        packages = process_changelog(since)
+        print('Processing {} packages'.format(len(packages)))
+        queryset = Package.objects.filter(name__in=packages).iterator()
+        thread_update(queryset=queryset, task=update_package)

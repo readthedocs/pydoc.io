@@ -99,8 +99,8 @@ def build(project, version=None):
         dist = release.distributions.get(filetype='bdist_wheel')
         project_url = dist.url
         project_filename = dist.filename
-    except Exception as e:
-        print("No valid wheel found. Skipping: {}".format(e))
+    except Exception:
+        print("No valid wheel found. Skipping: {}".format(release))
 
     _build_docs(project, version, project_url, project_filename)
 

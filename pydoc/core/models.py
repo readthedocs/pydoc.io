@@ -203,15 +203,15 @@ class Release(models.Model):
 
 class Distribution(models.Model):
     release = models.ForeignKey(Release, related_name="distributions")
-    filename = models.CharField(blank=True, default='', max_length=255,
+    filename = models.CharField(blank=True, default='', max_length=5000,
                                 help_text="the filename as provided by pypi")
     file = models.FileField(upload_to=conf.RELEASE_UPLOAD_TO,
                             null=True, blank=True,
                             help_text='the distribution file (if it was mirrord locally)',
-                            max_length=255)
+                            max_length=5000)
     url = models.URLField(null=True, blank=True,
                           help_text='the original url provided by pypi',
-                          max_length=255)
+                          max_length=5000)
     size = models.IntegerField(null=True, blank=True)
     md5_digest = models.CharField(max_length=32, blank=True)
     filetype = models.CharField(max_length=32, blank=False,

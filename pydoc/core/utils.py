@@ -3,6 +3,8 @@
 
 import time
 import xmlrpc.client
+import threading
+from queue import Queue
 
 import requests
 
@@ -27,6 +29,8 @@ def get_highest_version(package, data=None):
         data = package_resp.json()
     for version in data['releases']:
         versions.append(version)
+    if not versions:
+        return None
     version = sorted(versions)[-1]
     return version
 
@@ -78,8 +82,11 @@ def handle_build(packages, latest=False, built=True):
             versions = []
             for rel in package.releases.all():
                 versions.append(rel.version)
-            highest_version = sorted(versions)[-1]
-            build.delay(project=package.name, version=highest_version)
+            if len(versions):
+                highest_version = sorted(versions)[-1]
+                build.delay(project=package.name, version=highest_version)
+            else:
+                print("No versions; {}".format(package))
 
     else:
         for package in queryset:
@@ -117,7 +124,7 @@ def create_or_update_release(package, release, data=None,
                              update_distributions=False,
                              mirror_distributions=False):
     package = get_package(package, create=True)
-    if not len(release) <= 128:
+    if len(release) > 128:
         # TODO: more general validation and save to statistics
         print('ERR: Release too long: {}'.format(release))
         return
@@ -131,6 +138,10 @@ def create_or_update_release(package, release, data=None,
         'url': data['url'],
         'comment': data['comment_text'],
     }
+    if len(data['filename']) > 128:
+        # TODO: more general validation and save to statistics
+        print('ERR: Release too long: {}'.format(release))
+        return
     distribution, created = Distribution.objects.get_or_create(
         release=release_obj,
         filetype=data['packagetype'],
@@ -144,17 +155,37 @@ def create_or_update_release(package, release, data=None,
     return release_obj
 
 
-def process_changelog(since, update_releases=True,
-                      update_distributions=True, mirror_distributions=False):
+def process_changelog(since):
     client = xmlrpc.client.ServerProxy(PYPI_API_URL)
     timestamp = int(time.mktime(since.timetuple()))
     packages = {}
     for item in client.changelog(timestamp):
         packages[item[0]] = True
     print('Updating {} packages'.format(len(packages)))
-    for package in packages.keys():
-        print('Updating %s' % package)
-        update_package(package, create=True,
-                       update_releases=update_releases,
-                       update_distributions=update_distributions,
-                       mirror_distributions=mirror_distributions)
+    return packages.keys()
+
+
+def thread_update(queryset, task, thread_count=20, **kwargs):
+
+    def worker(q):
+        while True:
+            package = q.get()
+            print(threading.current_thread().name, package)
+            task(package, **kwargs)
+            q.task_done()
+
+    def run_queue(queryset):
+
+        q = Queue()
+
+        for i in range(thread_count):
+            t = threading.Thread(target=worker, args=(q,))
+            t.daemon = True
+            t.start()
+
+        for item in queryset:
+            q.put(item)
+
+        q.join()
+
+    run_queue(queryset)
