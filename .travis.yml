@@ -1,8 +1,22 @@
-sudo: true
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq build-essential gettext python3-setuptools python3-dev python-virtualenv 
 language: python
 python:
-- "3.5"
+ - 3.5
+sudo: false
+env:
+ - TOX_ENV=py35
+ - TOX_ENV=docs
+ - TOX_ENV=lint
+cache:
+  directories:
+    - ~/.cache/pip
+install:
+ - pip install tox
+script:
+ - tox -e $TOX_ENV
+notifications:
+  slack:
+    rooms:
+      - readthedocs:y3hjODOi7EIz1JAbD1Zb41sz#random
+    on_success: change
+    on_failure: always
 

@@ -9,6 +9,7 @@ uses:
 
 ignore-paths:
   - docs
+  - node_modules
 
 ignore-patterns:
   - /migrations/
