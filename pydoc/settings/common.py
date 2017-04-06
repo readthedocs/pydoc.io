@@ -15,6 +15,7 @@ import environ
 ROOT_DIR = environ.Path(__file__) - 3  # (pydoc/settings/common.py - 3 = pydoc/)
 APPS_DIR = ROOT_DIR.path('pydoc')
 DOCS_DIR = APPS_DIR.path('media', 'docs')
+JSON_DIR = APPS_DIR.path('media', 'json')
 
 env = environ.Env()
 env.read_env()

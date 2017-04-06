@@ -12,11 +12,10 @@ Contents:
    :maxdepth: 2
 
 
+Installation
+------------
 
-Indices and tables
-==================
+::
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+    django-admin update_package_index
+    cat requirements/common.txt django-admin process_freeze

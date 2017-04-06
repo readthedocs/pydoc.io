@@ -13,7 +13,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.postgres.fields import JSONField
 
 from . import conf
-from .pypi import TIMEFORMAT
 
 
 try:
@@ -190,11 +189,6 @@ class Release(models.Model):
                 'url': dist['url'],
                 'comment': dist['comment_text'],
             }
-            try:
-                data['uploaded_at'] = datetime.datetime.strptime(
-                    dist['upload_time'].value, TIMEFORMAT)
-            except:
-                pass
             distribution, created = Distribution.objects.get_or_create(
                 release=self,
                 filetype=dist['packagetype'],

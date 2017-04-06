@@ -22,7 +22,6 @@ class HomeView(TemplateView):
 
 class BuildView(View):
     form_class = BuildForm
-    # initial = {'project': 'requests'}
     template_name = "pages/build.html"
     title = "Pydoc Build"
 
@@ -34,7 +33,6 @@ class BuildView(View):
         form = self.form_class(request.POST)
         success = False
         if form.is_valid():
-            # <process form cleaned data>
             project = form.cleaned_data['project']
             build.delay(project=project)
             success = True
