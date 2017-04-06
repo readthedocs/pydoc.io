@@ -57,7 +57,8 @@ def _build_docs(project, version, project_url, project_filename):
                 autoapi_dir=autoapi_dir,
                 project=project,
                 version=version,
-                output_directory=settings.JSON_DIR,
+                output_directory=settings.JSON_DIR(),
+                python_path=settings.ROOT_DIR(),
             ))
             conf_file.write(to_write)
         print('Conf File now in %s' % conf_filename)
