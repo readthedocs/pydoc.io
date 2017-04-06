@@ -5,7 +5,7 @@ pypi.
 
 from django.core.management.base import BaseCommand
 from pydoc.core.models import Package
-from pydoc.core.pypi import update_package
+from pydoc.core.utils import update_package
 
 
 class Command(BaseCommand):

@@ -4,8 +4,7 @@ Build a specific set of packages.
 
 from django.core.management.base import BaseCommand
 
-from pydoc.core.tasks import build
-from pydoc.core.models import Package
+from pydoc.core.utils import handle_build
 
 
 class Command(BaseCommand):
@@ -14,15 +13,21 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('args', nargs='*')
 
+        parser.add_argument(
+            '--latest',
+            action='store_true',
+            dest='latest',
+            default=False,
+            help='Build all the latest versions of the packages',
+        )
+
+        parser.add_argument(
+            '--not-built',
+            action='store_false',
+            dest='built',
+            default=True,
+            help='Build unbuilt versions of this package',
+        )
+
     def handle(self, *args, **options):
-        for package_name in args:
-            package = Package.objects.get(name=package_name)
-            for release in package.releases.filter(built=True):
-                print("updating %s:%s" % (package, release))
-                build.delay(project=release.package.name, version=release.version)
-            break
-        else:
-            for package in Package.objects.filter(releases__built=True):
-                for release in package.releases.filter(built=True):
-                    print("updating %s:%s" % (package, release))
-                    build.delay(project=release.package.name, version=release.version)
+        handle_build(packages=args, latest=options['latest'], built=options['built'])

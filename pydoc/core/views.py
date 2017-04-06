@@ -4,7 +4,7 @@ from django.views import View
 
 from django import forms
 
-from pydoc.core.tasks import build
+from pydoc.core.utils import handle_build
 from pydoc.core.models import Release
 
 
@@ -34,7 +34,7 @@ class BuildView(View):
         success = False
         if form.is_valid():
             project = form.cleaned_data['project']
-            build.delay(project=project)
+            handle_build(packages=[project], latest=True)
             success = True
         return render(request, self.template_name, {
             'form': form, 'success': success

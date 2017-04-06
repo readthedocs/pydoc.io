@@ -71,7 +71,7 @@ class PackageIndex(models.Model):
             packages = self.client.list_packages()
         for package_name in packages:
             package, created = Package.objects.get_or_create(
-                index=self, name=package_name, defaults={'updated_from_remote_at': now})
+                index=self, name=package_name.lower(), defaults={'updated_from_remote_at': now})
             package.update_release_metadata(update_distribution_metadata=True)
         self.updated_from_remote_at = now
         self.save()

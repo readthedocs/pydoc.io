@@ -3,14 +3,15 @@ from __future__ import absolute_import
 import os
 import tempfile
 from collections import defaultdict
+import requests
+import urllib.request
+import zipfile
 
 from celery import Celery
 from django.apps import apps, AppConfig
 from django.conf import settings
 from django.template.loader import get_template
-import requests
-import urllib.request
-import zipfile
+
 
 if not settings.configured:
     # set the default Django settings module for the 'celery' program.
@@ -102,30 +103,17 @@ def _get_highest_version(project):
 
 @app.task
 def build(project, version=None):
-    from pydoc.core.pypi import create_or_update_release
+    from .models import Release
     if not version:
         version = _get_highest_version(project)
 
-    release = create_or_update_release(project, version)
-
-    project_resp = requests.get(
-        'https://pypi.python.org/pypi/{project}/{version}/json'.format(
-            project=project,
-            version=version,
-        )
-    )
-    project_json = project_resp.json()
-
-    project_url = project_filename = ''
-    for rel in project_json['releases'][version]:
-        if rel['packagetype'] == 'bdist_wheel':
-            project_url = rel['url']
-            project_filename = rel['filename']
-            break
-
-    if not project_url or not project_filename:
-        print("No valid wheel found. Skipping")
-        return
+    release = Release.objects.get(package__name=project, version=version)
+    try:
+        dist = release.distributions.get(filetype='bdist_wheel')
+        project_url = dist.url
+        project_filename = dist.filename
+    except Exception as e:
+        print("No valid wheel found. Skipping: {}".format(e))
 
     _build_docs(project, version, project_url, project_filename)
 

@@ -4,7 +4,7 @@ pypi.
 """
 
 from django.core.management.base import BaseCommand
-from pydoc.core.pypi import process_changelog
+from pydoc.core.utils import process_changelog
 import datetime
 
 
