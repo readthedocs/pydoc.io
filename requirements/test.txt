@@ -7,5 +7,4 @@ prospector==0.12.4
 
 # pytest
 pytest-django==3.0.0
-pytest-sugar==0.7.1
 
