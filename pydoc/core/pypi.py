@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from pydoc.core.models import Package, Release, Distribution, PackageIndex
 import datetime
@@ -83,11 +83,6 @@ def create_or_update_release(package, release,
                 'url': dist['url'],
                 'comment': dist['comment_text'],
             }
-            try:
-                data['uploaded_at'] = datetime.datetime.strptime(
-                    dist['upload_time'].value, TIMEFORMAT)
-            except:
-                pass
             distribution, created = Distribution.objects.get_or_create(
                 release=release,
                 filetype=dist['packagetype'],
@@ -115,4 +110,3 @@ def process_changelog(since, update_releases=True,
                        update_releases=update_releases,
                        update_distributions=update_distributions,
                        mirror_distributions=mirror_distributions)
-

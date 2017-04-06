@@ -77,7 +77,8 @@ def _build_docs(project, version, project_url, project_filename):
         if not os.path.exists(outdir.root):
             os.makedirs(outdir.root)
         print('Running Sphinx')
-        sphinx_command = 'sphinx-build -b html -d {root}_build/{name}-doctrees {root} {outdir}'.format(
+        sphinx_command = 'sphinx-build -b html '
+        '-d {root}_build/{name}-doctrees {root} {outdir}'.format(
             outdir=outdir.root,
             root=extract_dir,
             name=directory_name

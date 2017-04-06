@@ -70,10 +70,10 @@ INSTALLED_APPS += ('django_extensions', )
 # ------------------------------------------------------------------------------
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
-########## CELERY
+# CELERY
 # In development, all tasks will be executed locally by blocking until the task returns
 CELERY_ALWAYS_EAGER = True
-########## END CELERY
+# END CELERY
 
 try:
     # pylint: disable=unused-wildcard-import

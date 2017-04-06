@@ -38,7 +38,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # See: https://whitenoise.readthedocs.io/
 WHITENOISE_MIDDLEWARE = ('whitenoise.middleware.WhiteNoiseMiddleware', )
 MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
-# RAVEN_MIDDLEWARE = ('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware', )
 # MIDDLEWARE = RAVEN_MIDDLEWARE + MIDDLEWARE
 
 
@@ -129,7 +128,9 @@ EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
 # https://docs.djangoproject.com/en/dev/ref/templates/api/#django.template.loaders.cached.Loader
 TEMPLATES[0]['OPTIONS']['loaders'] = [
     ('django.template.loaders.cached.Loader', [
-        'django.template.loaders.filesystem.Loader', 'django.template.loaders.app_directories.Loader', ]),
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    ]),
 ]
 
 # DATABASE CONFIGURATION
@@ -159,7 +160,8 @@ CACHES = {
 
 # Sentry Configuration
 SENTRY_DSN = env('DJANGO_SENTRY_DSN')
-SENTRY_CLIENT = env('DJANGO_SENTRY_CLIENT', default='raven.contrib.django.raven_compat.DjangoClient')
+SENTRY_CLIENT = env('DJANGO_SENTRY_CLIENT',
+                    default='raven.contrib.django.raven_compat.DjangoClient')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,

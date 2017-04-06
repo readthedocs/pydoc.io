@@ -118,8 +118,8 @@ class Package(models.Model):
         except UnicodeEncodeError:
             return
         # True -> show hidden
-        for release_string in self.index.client.package_releases(self.name, True):
-            data = self.index.client.release_data(self.name, release_string)
+        for release_string in self.index.client.package_releases(name, True):
+            data = self.index.client.release_data(name, release_string)
             kwargs = {
                 'hidden': data.get('_pypi_hidden', False),
                 'package_info': MultiValueDict(),
@@ -222,9 +222,9 @@ class Distribution(models.Model):
     signature = models.TextField(blank=True, default='')
 
     uploaded_at = models.DateTimeField(null=True, blank=True,
-                                       help_text='the time at which the package was uploaded (on pypi)')
+                                       help_text='The time the package was uploaded (on pypi)')
     mirrored_at = models.DateTimeField(null=True, blank=True,
-                                       help_text='the time at which the package was downloaded to this mirror.')
+                                       help_text='The time the package was downloaded (here)')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
