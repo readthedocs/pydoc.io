@@ -46,8 +46,6 @@ THIRD_PARTY_APPS = (
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
-    # custom users app
-    'pydoc.users.apps.UsersConfig',
     'pydoc.core',
 )
 
@@ -65,12 +63,6 @@ MIDDLEWARE = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
-
-# MIGRATIONS CONFIGURATION
-# ------------------------------------------------------------------------------
-MIGRATION_MODULES = {
-    'sites': 'pydoc.contrib.sites.migrations'
-}
 
 # DEBUG
 # ------------------------------------------------------------------------------
@@ -236,20 +228,16 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 ACCOUNT_ALLOW_REGISTRATION = env.bool('DJANGO_ACCOUNT_ALLOW_REGISTRATION', True)
-ACCOUNT_ADAPTER = 'pydoc.users.adapters.AccountAdapter'
-SOCIALACCOUNT_ADAPTER = 'pydoc.users.adapters.SocialAccountAdapter'
 
 # Custom user app defaults
 # Select the correct user model
-AUTH_USER_MODEL = 'users.User'
-LOGIN_REDIRECT_URL = 'users:redirect'
 LOGIN_URL = 'account_login'
 
 # SLUGLIFIER
 AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
 
 ########## CELERY
-INSTALLED_APPS += ('pydoc.taskapp.celery.CeleryConfig',)
+INSTALLED_APPS += ('pydoc.core.tasks.CeleryConfig',)
 # if you are not using the django database broker (e.g. rabbitmq, redis, memcached), you can remove the next line.
 INSTALLED_APPS += ('kombu.transport.django',)
 BROKER_URL = env('CELERY_BROKER_URL', default='django://')

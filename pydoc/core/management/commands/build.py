@@ -4,7 +4,7 @@ Build a specific set of packages.
 
 from django.core.management.base import BaseCommand
 
-from pydoc.taskapp.celery import build
+from pydoc.core.tasks import build
 from pydoc.core.models import Package
 
 

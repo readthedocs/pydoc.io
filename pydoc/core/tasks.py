@@ -21,7 +21,7 @@ app = Celery('pydoc')
 
 
 class CeleryConfig(AppConfig):
-    name = 'pydoc.taskapp'
+    name = 'pydoc.core.tasks'
     verbose_name = 'Celery Config'
 
     def ready(self):

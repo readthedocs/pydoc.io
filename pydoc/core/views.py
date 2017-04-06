@@ -1,11 +1,10 @@
 from django.views.generic import TemplateView
-from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views import View
 
 from django import forms
 
-from pydoc.taskapp.celery import build
+from pydoc.core.tasks import build
 from pydoc.core.models import Release
 
 

@@ -5,7 +5,7 @@ pypi.
 
 import sys
 from django.core.management.base import BaseCommand
-from pydoc.taskapp.celery import build
+from pydoc.core.tasks import build
 
 
 class Command(BaseCommand):
