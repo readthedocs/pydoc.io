@@ -12,7 +12,7 @@ from __future__ import absolute_import, unicode_literals
 
 import environ
 
-ROOT_DIR = environ.Path(__file__) - 3  # (pydoc/config/settings/common.py - 3 = pydoc/)
+ROOT_DIR = environ.Path(__file__) - 3  # (pydoc/settings/common.py - 3 = pydoc/)
 APPS_DIR = ROOT_DIR.path('pydoc')
 DOCS_DIR = APPS_DIR.path('media', 'docs')
 
@@ -198,10 +198,10 @@ MEDIA_URL = '/media/'
 
 # URL Configuration
 # ------------------------------------------------------------------------------
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'pydoc.urls'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = 'pydoc.wsgi.application'
 
 
 # PASSWORD VALIDATION
