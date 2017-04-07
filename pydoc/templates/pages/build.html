@@ -16,13 +16,26 @@ Build a new package
     </table>
 </form>
 
-{% if success %}
+{% if tried %}
 
-Successfully built {{ form.cleaned_data.package }}
+<hr>
 
-{% elif tried %}
+<h3> Results </h3>
 
-No wheel found for {{ form.cleaned_data.package }}.
+    {% if success %}
+
+    <p>
+    Triggered build for {{ form.cleaned_data.package }}.
+    </p>
+
+    {% else %}
+
+    <p>
+    No wheel found for {{ form.cleaned_data.package }}.
+    Please try another packages that has released a wheel.
+    </p>
+
+    {% endif %}
 
 {% endif %}
 
