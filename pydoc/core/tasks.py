@@ -99,6 +99,7 @@ def build(project, version=None):
         project_filename = dist.filename
     except Exception:
         print("No valid wheel found. Skipping: {}".format(release))
+        return
 
     _build_docs(project, version, project_url, project_filename)
 
