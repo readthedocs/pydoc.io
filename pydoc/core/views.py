@@ -58,8 +58,8 @@ class ProjectSearchView(View):
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get('package')
-        form = self.form_class(request.GET)
         if query:
+            form = self.form_class(request.GET)
             packages = Package.objects.filter(name__icontains=query, releases__built=True)
             rels = [package.releases.latest() for package in packages]
             return render(
@@ -67,4 +67,4 @@ class ProjectSearchView(View):
                 self.template_name,
                 {'form': form, 'releases': rels}
             )
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': self.form_class()})
