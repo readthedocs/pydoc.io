@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 from __future__ import absolute_import, unicode_literals
 
+from datetime import timedelta
 import environ
 
 ROOT_DIR = environ.Path(__file__) - 3  # (pydoc/settings/common.py - 3 = pydoc/)
@@ -248,6 +249,17 @@ if BROKER_URL == 'django://':
 else:
     CELERY_RESULT_BACKEND = BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERYBEAT_SCHEDULE = {
+    'update-from-pypi': {
+        'task': 'tasks.update_from_pypi',
+        'schedule': timedelta(minutes=15),
+    },
+}
+
+CELERY_TIMEZONE = 'UTC'
 
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
