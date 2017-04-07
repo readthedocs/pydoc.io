@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load core_tags %}
-{% load crispy_forms_tags %}
 
 
 {% block content %}
@@ -8,12 +7,23 @@
 
 Find a package
 
-<form method="POST" action=".">
+<form method="GET" action=".">
     <table>
-    {% csrf_token %}
-    {% crispy form %}
+    {{ form.as_p }}
     <input type="submit" />
     </table>
 </form>
+
+{% if releases %}
+<hr>
+    <h3> Results </h3>
+    {% for release in releases %}
+        {% filter restructuredtext %}
+
+        * `{{ release.release_name }} </pypi/{{ release.release_name }}/index.html>`_
+
+        {% endfilter %}
+    {% endfor %}
+{% endif %}
 
 {% endblock content %}

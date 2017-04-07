@@ -1,5 +1,4 @@
 from django.views.generic import TemplateView
-from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
 
@@ -58,11 +57,14 @@ class ProjectSearchView(View):
     template_name = "pages/search.html"
 
     def get(self, request, *args, **kwargs):
-        query = request.GET.get('q')
+        query = request.GET.get('package')
+        form = self.form_class(request.GET)
         if query:
-            packages = Package.objects.filter(name__icontains=query)
-            ret = [package.name for package in packages]
-            return JsonResponse({'packages': ret}, json_dumps_params={'indent': 4})
-        else:
-            form = self.form_class()
-            return render(request, self.template_name, {'form': form})
+            packages = Package.objects.filter(name__icontains=query, releases__built=True)
+            rels = [package.releases.latest() for package in packages]
+            return render(
+                request,
+                self.template_name,
+                {'form': form, 'releases': rels}
+            )
+        return render(request, self.template_name, {'form': form})
