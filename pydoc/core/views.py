@@ -5,10 +5,10 @@ from django.views import View
 from django import forms
 
 from pydoc.core.utils import handle_build, get_highest_version, update_package
-from pydoc.core.models import Release, Distribution
+from pydoc.core.models import Release, Distribution, Package
 
 
-class BuildForm(forms.Form):
+class PackageForm(forms.Form):
     package = forms.CharField(label='Package', max_length=100)
 
 
@@ -21,7 +21,7 @@ class HomeView(TemplateView):
 
 
 class BuildView(View):
-    form_class = BuildForm
+    form_class = PackageForm
     template_name = "pages/build.html"
     title = "Pydoc Build"
 
@@ -50,3 +50,21 @@ class BuildView(View):
         return render(request, self.template_name, {
             'form': form, 'success': success, 'tried': tried
         })
+
+
+class ProjectSearchView(View):
+    form_class = PackageForm
+    template_name = "pages/search.html"
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('package')
+        form = self.form_class(request.GET)
+        if query:
+            packages = Package.objects.filter(name__icontains=query, releases__built=True)
+            rels = [package.releases.latest() for package in packages]
+            return render(
+                request,
+                self.template_name,
+                {'form': form, 'releases': rels}
+            )
+        return render(request, self.template_name, {'form': form})

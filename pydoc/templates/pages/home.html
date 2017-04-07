@@ -16,10 +16,13 @@ especially around the documentation UX and parsing.
 
 You can read more information in our `About <{% url 'about' %}>`_ page.
 
-You can check out our listing of current projects that we're building here:
+So far we have built {{ view.projects.count }} projects.
+
+You can find more packages by `searching for them <{% url 'search' %}>`_.
+These are the latest packages we've built:
 {% endfilter %}
 
-{% for release in view.projects %}
+{% for release in view.projects|slice:':10' %}
 {% filter restructuredtext %}
 
 * `{{ release.release_name }} </pypi/{{ release.release_name }}/index.html>`_
