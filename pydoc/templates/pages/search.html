@@ -5,18 +5,17 @@
 {% block content %}
 
 
-Find a package
-
 <form method="GET" action=".">
     <table>
     {{ form.as_p }}
-    <input type="submit" />
+    <input type="submit" value="Find it!" />
     </table>
 </form>
 
-{% if releases %}
 <hr>
-    <h3> Results </h3>
+<h3> Results </h3>
+
+{% if releases %}
     {% for release in releases %}
         {% filter restructuredtext %}
 
@@ -24,6 +23,10 @@ Find a package
 
         {% endfilter %}
     {% endfor %}
+{% else %}
+
+No projects found.
+
 {% endif %}
 
 {% endblock content %}
