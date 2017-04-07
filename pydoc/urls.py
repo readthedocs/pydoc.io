@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^$', core_views.HomeView.as_view(), name='home'),
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
     url(r'^build/$', core_views.BuildView.as_view(), name='build'),
+    url(r'^search/$', core_views.ProjectSearchView.as_view(), name='search'),
 
     # Django Admin, use {% url 'admin:index' %}
     url(settings.ADMIN_URL, admin.site.urls),
