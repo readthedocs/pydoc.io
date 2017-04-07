@@ -107,3 +107,8 @@ def build(project, version=None):
     if os.path.exists(os.path.join(outdir.root, 'index.html')):
         release.built = True
         release.save()
+
+
+def update_from_pypi():
+    from .utils import build_changelog
+    build_changelog()

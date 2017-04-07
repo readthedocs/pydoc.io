@@ -61,21 +61,6 @@ class PackageIndex(models.Model):
             self._client = xmlrpc.client.ServerProxy(self.xml_rpc_url)
         return self._client
 
-    def update_package_list(self, since=None, full=False):
-        now = datetime.datetime.now()
-        since = since or self.updated_from_remote_at
-        if since and not full:
-            timestamp = int(time.mktime(since.timetuple()))
-            packages = set([item[0] for item in self.client.changelog(timestamp)])
-        else:
-            packages = self.client.list_packages()
-        for package_name in packages:
-            package, created = Package.objects.get_or_create(
-                index=self, name=package_name.lower(), defaults={'updated_from_remote_at': now})
-            package.update_release_metadata(update_distribution_metadata=True)
-        self.updated_from_remote_at = now
-        self.save()
-
 
 class Package(models.Model):
     index = models.ForeignKey(PackageIndex)
@@ -110,33 +95,6 @@ class Package(models.Model):
             return self.releases.get(version=version)
         except Release.DoesNotExist:
             return None
-
-    def update_release_metadata(self, update_distribution_metadata=True):
-        now = datetime.datetime.now()
-        try:
-            name = self.name.encode('ascii')
-        except UnicodeEncodeError:
-            return
-        # True -> show hidden
-        for release_string in self.index.client.package_releases(name, True):
-            data = self.index.client.release_data(name, release_string)
-            kwargs = {
-                'hidden': data.get('_pypi_hidden', False),
-                'package_info': MultiValueDict(),
-                'is_from_external': False,
-            }
-            for key, value in data.items():
-                kwargs['package_info'][key] = value
-            release, created = Release.objects.get_or_create(
-                package=self, version=release_string, defaults=kwargs)
-            if not created:
-                for key, value in kwargs.items():
-                    setattr(release, key, value)
-                release.save()
-            if update_distribution_metadata:
-                release.update_distribution_metatdata()
-        self.updated_from_remote_at = now
-        self.save()
 
 
 class Release(models.Model):
@@ -179,26 +137,6 @@ class Release(models.Model):
     @property
     def classifiers(self):
         return self.package_info.getlist('classifier')
-
-    def update_distribution_metatdata(self):
-        for dist in self.package.index.client.release_urls(self.package.name, self.version):
-            data = {
-                'filename': dist['filename'],
-                'md5_digest': dist['md5_digest'],
-                'size': dist['size'],
-                'url': dist['url'],
-                'comment': dist['comment_text'],
-            }
-            distribution, created = Distribution.objects.get_or_create(
-                release=self,
-                filetype=dist['packagetype'],
-                pyversion=dist['python_version'],
-                defaults=data)
-            if not created:
-                # this means we have to update the existing record
-                for key, value in data.items():
-                    setattr(distribution, key, value)
-                distribution.save()
 
 
 class Distribution(models.Model):

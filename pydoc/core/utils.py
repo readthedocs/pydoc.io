@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import datetime
 import time
 import xmlrpc.client
 import threading
@@ -84,7 +85,14 @@ def handle_build(packages, latest=False, built=True):
                 versions.append(rel.version)
             if len(versions):
                 highest_version = sorted(versions)[-1]
-                build.delay(project=package.name, version=highest_version)
+                if package.releases.filter(version=highest_version, built=built).exists():
+                    build.delay(project=package.name, version=highest_version)
+                else:
+                    print(
+                        'Latest version package already built: {}-{}'.format(
+                            package, highest_version
+                        )
+                    )
             else:
                 print("No versions; {}".format(package))
 
@@ -155,7 +163,7 @@ def create_or_update_release(package, release, data=None,
     return release_obj
 
 
-def process_changelog(since):
+def updated_packages_since(since):
     client = xmlrpc.client.ServerProxy(PYPI_API_URL)
     timestamp = int(time.mktime(since.timetuple()))
     packages = {}
@@ -189,3 +197,9 @@ def thread_update(queryset, task, thread_count=20, **kwargs):
         q.join()
 
     run_queue(queryset)
+
+
+def build_changelog():
+    since = datetime.datetime.utcnow() - datetime.timedelta(minutes=16)
+    packages = updated_packages_since(since)
+    handle_build(packages, latest=True, built=False)
