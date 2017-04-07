@@ -24,7 +24,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['build']:
             print('Building changelog')
-            build_changelog()
+            build_changelog(hours=2)
         else:
             since = datetime.datetime.utcnow() - datetime.timedelta(days=1)
             print("updating change from pypi since %s" % since)

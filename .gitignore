@@ -39,3 +39,4 @@ pydoc/media/
 pydoc/settings/local_settings.py
 
 .cache
+celerybeat-schedule

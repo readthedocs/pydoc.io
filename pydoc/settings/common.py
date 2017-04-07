@@ -254,8 +254,9 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 CELERYBEAT_SCHEDULE = {
     'update-from-pypi': {
-        'task': 'tasks.update_from_pypi',
+        'task': 'pydoc.core.tasks.update_from_pypi',
         'schedule': timedelta(minutes=15),
+        'kwargs': {'minutes': 16},
     },
 }
 
