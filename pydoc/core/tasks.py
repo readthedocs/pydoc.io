@@ -109,6 +109,7 @@ def build(project, version=None):
         release.save()
 
 
+@app.task
 def update_from_pypi():
     from .utils import build_changelog
     build_changelog()
