@@ -30,7 +30,7 @@ autoapi_keep_files = False
 autoapi_type = 'python'
 autoapi_file_pattern = '*.py'
 autoapi_ignore = ['packages*', 'vendor*']
-autoapi_dirs = ['{{autoapi_dir}}']
+autoapi_dirs = {{ autoapi_dirs|safe }}
 
 # Standard stuff
 
