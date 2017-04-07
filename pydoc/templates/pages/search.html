@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load core_tags %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+
+Find a package
+
+<form method="POST" action=".">
+    <table>
+    {% csrf_token %}
+    {% crispy form %}
+    <input type="submit" />
+    </table>
+</form>
+
+{% endblock content %}
