@@ -203,4 +203,5 @@ def thread_update(queryset, task, thread_count=20, **kwargs):
 def build_changelog(**time_kwargs):
     since = datetime.datetime.utcnow() - datetime.timedelta(**time_kwargs)
     packages = updated_packages_since(since)
-    handle_build(packages, latest=True, built=False)
+    for package in packages:
+        handle_build([package], latest=True, built=False)
