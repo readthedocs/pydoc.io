@@ -110,6 +110,6 @@ def build(project, version=None):
 
 
 @app.task
-def update_from_pypi():
+def update_from_pypi(**time_kwargs):
     from .utils import build_changelog
-    build_changelog()
+    build_changelog(**time_kwargs)
