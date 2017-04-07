@@ -72,9 +72,10 @@ def handle_build(packages, latest=False, built=True):
     from .tasks import build
 
     if packages:
-        queryset = Package.objects.filter(name__in=packages)
+        # Create objects that don't exist
         for arg in packages:
-            update_package(arg)
+            update_package(arg, create=True)
+        queryset = Package.objects.filter(name__in=packages)
     else:
         queryset = Package.objects.all()
 
@@ -169,7 +170,7 @@ def updated_packages_since(since):
     packages = {}
     for item in client.changelog(timestamp):
         packages[item[0]] = True
-    print('Updating {} packages'.format(len(packages)))
+    print('{} packages updated since {}'.format(len(packages), since))
     return packages.keys()
 
 
