@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import json
 import os
 import tempfile
 import urllib.request
@@ -43,16 +44,16 @@ def _build_docs(project, version, project_url, project_filename):
             zip_ref.extractall(extract_dir)
         print('File now in %s' % extract_dir)
 
-        autoapi_dir = ''
+        autoapi_dirs = []
         for possible_project in os.listdir(extract_dir):
             if '__init__.py' in os.listdir(os.path.join(extract_dir, possible_project)):
-                autoapi_dir = os.path.join(extract_dir, possible_project)
-        print('Autoapi now in %s' % autoapi_dir)
+                autoapi_dirs.append(os.path.join(extract_dir, possible_project))
+        print('Autoapi now in %s' % autoapi_dirs)
 
         conf_filename = os.path.join(extract_dir, 'conf.py')
         with open(conf_filename, 'w+') as conf_file:
             to_write = conf_template.render(dict(
-                autoapi_dir=autoapi_dir,
+                autoapi_dirs=json.dumps(autoapi_dirs),
                 project=project,
                 version=version,
                 output_directory=settings.JSON_DIR(),
@@ -64,7 +65,6 @@ def _build_docs(project, version, project_url, project_filename):
         index_filename = os.path.join(extract_dir, 'index.rst')
         with open(index_filename, 'w+') as index_file:
             to_write = index_template.render(dict(
-                autoapi_dir=autoapi_dir,
                 project=project,
                 version=version,
             ))
