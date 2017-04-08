@@ -5,8 +5,7 @@ pypi.
 
 import sys
 from django.core.management.base import BaseCommand
-from pydoc.core.tasks import build
-from pydoc.core.utils import update_package
+from pydoc.core.utils import handle_build
 
 
 class Command(BaseCommand):
@@ -20,5 +19,4 @@ class Command(BaseCommand):
             print(line)
             package, version = line.split('==')
             print("Building %s:%s" % (package, version))
-            update_package(package=package)
-            build.delay(project=package, version=version)
+            handle_build(packages=[package], version=version, built=False)
