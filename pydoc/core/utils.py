@@ -138,12 +138,12 @@ def update_package(package, create=True, update_releases=True,
         for release, data in package_json['releases'].items():
             for dist in data:
                 create_or_update_release(
-                    package, release, dist,
+                    package, release, package_info=package_json['info'], data=dist,
                     update_distributions=update_distributions,
                     mirror_distributions=mirror_distributions)
 
 
-def create_or_update_release(package, release, data=None,
+def create_or_update_release(package, release, package_info=None, data=None,
                              update_distributions=False,
                              mirror_distributions=False):
     package = get_package(package, create=True)
@@ -153,6 +153,9 @@ def create_or_update_release(package, release, data=None,
         return
     release_obj, created = Release.objects.get_or_create(package=package,
                                                          version=release)
+
+    release_obj.package_info = package_info
+    release_obj.save()
     print('Updating release {}'.format(release_obj))
     update_data = {
         'filename': data['filename'],
@@ -160,6 +163,7 @@ def create_or_update_release(package, release, data=None,
         'size': data['size'],
         'url': data['url'],
         'comment': data['comment_text'],
+        'uploaded_at': data['upload_time']
     }
     if len(data['filename']) > 128:
         # TODO: more general validation and save to statistics
