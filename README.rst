@@ -5,6 +5,30 @@ Pydoc
 
 Welcome to Pydoc.
 
+Installation
+------------
+
+::
+    
+    git clone https://github.com/rtfd/pydoc.io
+    cd pydoc.io
+    pip install -r requirements/local.txt
+    ./manage.py createsuperuser
+
+Now, you can update the list of packages from Pypi::
+
+    ./manage.py update_package_index
+
+And build some examples::
+
+    pip freeze | ./manage.py process_freeze
+
+You should now be able to start a start:
+
+    ./manage.py runserver
+
+If you browse to http://localhost:8000 you should see a list of docs to view!
+
 Basic Commands
 --------------
 
@@ -46,7 +70,7 @@ To run a celery worker:
 .. code-block:: bash
 
     cd pydoc
-    celery -A pydoc.core.celery worker -l info
+    celery -A pydoc.core.tasks worker -l info
 
 Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
 

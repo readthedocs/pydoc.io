@@ -68,7 +68,7 @@ def get_package_json(package):
     return ''
 
 
-def handle_build(packages, latest=False, built=True):
+def handle_build(packages, version='', latest=False, built=True):
     from .tasks import build
 
     if packages:
@@ -78,6 +78,10 @@ def handle_build(packages, latest=False, built=True):
         queryset = Package.objects.filter(name__in=packages)
     else:
         queryset = Package.objects.all()
+
+    if not queryset.exists():
+        print('No queryset')
+        continue
 
     if latest:
         for package in queryset:
@@ -97,6 +101,16 @@ def handle_build(packages, latest=False, built=True):
             else:
                 print("No versions; {}".format(package))
 
+    elif version:
+        print("updating %s:%s" % (packages[0], version))
+        if queryset and queryset[0].releases.filter(version=version, built=built).exists():
+            build.delay(project=packages[0], version=version)
+        else:
+            print(
+                'Latest version package already built: {}-{}'.format(
+                    packages[0], version
+                )
+            )
     else:
         for package in queryset:
             qs = package.releases.all()
@@ -114,7 +128,7 @@ def update_package_list(url=None):
         package, created = Package.objects.get_or_create(index=index, name=package_name.lower())
 
 
-def update_package(package, create=False, update_releases=True,
+def update_package(package, create=True, update_releases=True,
                    update_distributions=True, mirror_distributions=False):
     package_obj = get_package(package, create=create)
     if update_releases:

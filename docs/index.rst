@@ -11,19 +11,3 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-
-Installation
-------------
-
-::
-
-    ./manage.py createsuperuser
-
-Now with your user, login to the admin, and create a **Package Index** that points at Pypi.
-This will be the default.
-
-Now::
-
-    ./manage.py update_package_index
-
-    cat requirements/common.txt | django-admin process_freeze
