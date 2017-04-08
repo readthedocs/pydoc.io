@@ -81,7 +81,7 @@ def handle_build(packages, version='', latest=False, built=True):
 
     if not queryset.exists():
         print('No queryset')
-        continue
+        return None
 
     if latest:
         for package in queryset:
