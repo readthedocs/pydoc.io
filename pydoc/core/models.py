@@ -111,8 +111,8 @@ class Release(models.Model):
         verbose_name = _(u"release")
         verbose_name_plural = _(u"releases")
         unique_together = ("package", "version")
-        get_latest_by = 'created'
-        ordering = ['-created']
+        get_latest_by = 'distributions__uploaded_at'
+        ordering = ['-distributions__uploaded_at']
 
     def __str__(self):
         return self.release_name

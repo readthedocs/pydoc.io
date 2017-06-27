@@ -31,7 +31,7 @@ class CeleryConfig(AppConfig):
         app.autodiscover_tasks(lambda: installed_apps, force=True)
 
 
-def _build_docs(project, version, project_url, project_filename):
+def _build_docs(project, version, project_url, project_filename, releases):
     conf_template = get_template('sphinx/conf.py.tmpl')
     index_template = get_template('sphinx/index.rst.tmpl')
 
@@ -56,6 +56,7 @@ def _build_docs(project, version, project_url, project_filename):
                 autoapi_dirs=json.dumps(autoapi_dirs),
                 project=project,
                 version=version,
+                releases=releases,
                 output_directory=settings.JSON_DIR(),
                 python_path=settings.ROOT_DIR(),
             ))
@@ -93,15 +94,16 @@ def build(project, version=None):
         version = get_highest_version(project)
 
     release = Release.objects.get(package__name=project, version=version)
+    releases = Release.objects.filter(package__name=project, built=True)
     try:
         dist = release.distributions.get(filetype='bdist_wheel')
         project_url = dist.url
         project_filename = dist.filename
     except Exception:
         print("No valid wheel found. Skipping: {}".format(release))
-        return
+        raise
 
-    _build_docs(project, version, project_url, project_filename)
+    _build_docs(project, version, project_url, project_filename, releases)
 
     directory_name = "{name}-{version}".format(name=project, version=version)
     outdir = settings.DOCS_DIR.path(directory_name)

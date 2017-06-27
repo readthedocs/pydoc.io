@@ -8,6 +8,8 @@ import threading
 from queue import Queue
 
 import requests
+from django.conf import settings
+from django.core.cache import cache
 
 from .models import Package, Release, Distribution, PackageIndex
 
@@ -223,3 +225,17 @@ def build_changelog(**time_kwargs):
     packages = updated_packages_since(since)
     for package in packages:
         handle_build([package], latest=True, built=False)
+
+
+def update_popular():
+    API_KEY = getattr(settings, 'LIBRARIES_API_KEY', None)
+    if not API_KEY:
+        return ()
+    url = 'https://libraries.io/api/search/?platforms=Pypi&sort=rank?api_key={key}'.format(
+        key=API_KEY,
+    )
+    resp = requests.get(url)
+    data = resp.json()
+    popular = [obj['name'] for obj in data]
+    cache.set('homepage_popular', popular, 3600)
+    return popular
