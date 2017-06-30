@@ -121,10 +121,11 @@ class Release(models.Model):
     def release_name(self):
         return u"%s-%s" % (self.package.name, self.version)
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('packageindex-release', (), {'package': self.package.name,
-                                             'version': self.version})
+        # TODO perhaps don't hard code this
+        return ('/pypi/{package}-{version}/'
+                .format(package=self.package.name,
+                        version=self.version))
 
     @property
     def summary(self):

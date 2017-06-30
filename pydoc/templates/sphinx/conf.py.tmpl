@@ -49,3 +49,11 @@ copyright = u'2016'
 html_context = {
     'output_directory': '{{ output_directory }}',
 }
+
+html_theme_options = {
+    'versions': {
+{% for release in releases %}
+        '{{ release.version }}': '{{ release.get_absolute_url }}',
+{% endfor %}
+    }
+}
