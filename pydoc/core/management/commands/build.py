@@ -1,10 +1,8 @@
-"""
-Build a specific set of packages.
-"""
+"""Build a specific set of packages"""
 
 from django.core.management.base import BaseCommand
 
-from pydoc.core.utils import handle_build
+from pydoc.core.tasks import handle_build
 
 
 class Command(BaseCommand):

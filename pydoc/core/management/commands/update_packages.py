@@ -1,16 +1,14 @@
-"""
-Management command for loading all the known packages from the official
-pypi.
-"""
+"""Update package from PyPI"""
 
 from django.core.management.base import BaseCommand
+
 from pydoc.core.models import Package
-from pydoc.core.utils import update_package, thread_update
+from pydoc.core.tasks import update_package, thread_update
 
 
 class Command(BaseCommand):
     args = '<package_name package_name ...>'
-    help = """Update the package index (packages only. no releases.)"""
+    help = """Update the package index (packages only, no releases)"""
 
     def add_arguments(self, parser):
         parser.add_argument('args', nargs='*')

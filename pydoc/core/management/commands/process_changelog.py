@@ -1,12 +1,12 @@
-"""
-Management command for loading all the known packages from the official
-pypi.
-"""
+"""Update the package index with changed packages"""
+
+import datetime
 
 from django.core.management.base import BaseCommand
-from pydoc.core.utils import updated_packages_since, update_package, thread_update, build_changelog
+
 from pydoc.core.models import Package
-import datetime
+from pydoc.core.tasks import (
+    updated_packages_since, update_package, thread_update, build_changelog)
 
 
 class Command(BaseCommand):

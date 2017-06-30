@@ -1,10 +1,7 @@
-"""
-Management command for loading all the known packages from the official
-pypi.
-"""
+"""Load all the known packages from the official PyPI"""
 
 from django.core.management.base import BaseCommand
-from pydoc.core.utils import update_package_list
+from pydoc.core.tasks import update_package_list
 
 
 class Command(BaseCommand):

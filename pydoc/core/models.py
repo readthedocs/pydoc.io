@@ -190,5 +190,4 @@ class Distribution(models.Model):
     def path(self):
         if self.file:
             return self.file.url
-        else:
-            return self.url
+        return self.url

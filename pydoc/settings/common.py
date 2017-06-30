@@ -239,15 +239,8 @@ LOGIN_URL = 'account_login'
 AUTOSLUG_SLUGIFY_FUNCTION = 'slugify.slugify'
 
 # CELERY
-INSTALLED_APPS += (
-    'pydoc.core.tasks.CeleryConfig',
-    'kombu.transport.django',
-)
-BROKER_URL = env('CELERY_BROKER_URL', default='django://')
-if BROKER_URL == 'django://':
-    CELERY_RESULT_BACKEND = 'redis://'
-else:
-    CELERY_RESULT_BACKEND = BROKER_URL
+BROKER_URL = env('CELERY_BROKER_URL', default='redis://')
+CELERY_RESULT_BACKEND = BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -280,4 +273,41 @@ RESTRUCTUREDTEXT_FILTER_SETTINGS = {
     'syntax_highlight': 'none',
     'math_output': 'latex',
     'field_name_limit': 50,
+}
+
+LOG_FORMAT = '%(name)s:%(lineno)s[%(process)d]: %(levelname)s %(message)s'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': LOG_FORMAT,
+            'datefmt': '%d/%b/%Y %H:%M:%S',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default'
+        },
+        'debug': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'debug.log',
+            'formatter': 'default',
+        },
+    },
+    'loggers': {
+        'pydoc': {
+            'handlers': ['debug', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        '': {
+            'handlers': ['debug', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
 }

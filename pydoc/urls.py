@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.views.generic import TemplateView
 from django.views import defaults as default_views
+from django.views.generic import TemplateView
 
 from pydoc.core import views as core_views
+
 
 urlpatterns = [
     url(r'^$', core_views.HomeView.as_view(), name='home'),
@@ -45,8 +47,11 @@ if settings.DEBUG:
         url(r'^500/$', default_views.server_error),
     ]
     if 'debug_toolbar' in settings.INSTALLED_APPS:
-        import debug_toolbar
+        try:
+            import debug_toolbar
 
-        urlpatterns += [
-            url(r'^__debug__/', include(debug_toolbar.urls)),
-        ]
+            urlpatterns += [
+                url(r'^__debug__/', include(debug_toolbar.urls)),
+            ]
+        except ImportError:
+            pass
