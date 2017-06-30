@@ -34,22 +34,34 @@ except NameError:
     basestring = str
 
 
+def get_package_data(package):
+    resp = requests.get('{api_root}/{package}/json'
+                        .format(api_root=PYPI_API_URL, package=package))
+    if resp.status_code != 200:
+        log.error('Error fetching package from PyPI: url=%s, status_code=%s',
+                  resp, resp.status_code)
+        return {}
+    try:
+        resp_json = resp.json()
+        resp_json['info']['name'] = resp_json['info']['name'].lower()
+        return resp_json
+    except json.decoder.JSONDecodeError:
+        log.error('Package not found on PyPI: package=%s', package)
+    return {}
+
+
 def get_highest_version(package, data=None):
     # Get highest version
     versions = []
     if not data:
-        package_resp = requests.get(
-            'https://pypi.python.org/pypi/{name}/json'.format(name=package)
-        )
-        try:
-            data = package_resp.json()
-        except json.decoder.JSONDecodeError:
-            log.error('Package not found: package=%s', package)
-            log.debug('Response: %s', package_resp.content)
-            return None
-    for version in data['releases']:
-        versions.append(version)
+        data = get_package_data(package)
+    try:
+        for version in data['releases']:
+            versions.append(version)
+    except KeyError:
+        return None
     if not versions:
         return None
+    # TODO replace with semver sorting
     version = sorted(versions)[-1]
     return version

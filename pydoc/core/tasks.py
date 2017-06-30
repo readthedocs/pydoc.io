@@ -21,7 +21,7 @@ from django.core.cache import cache
 from django.template.loader import get_template
 
 from .models import Release, Package, Distribution, PackageIndex
-from .utils import get_highest_version
+from .utils import get_package_data, get_highest_version
 
 
 log = logging.getLogger(__name__)
@@ -46,13 +46,13 @@ def _build_docs(project, version, project_url, project_filename, releases):
         urllib.request.urlretrieve(project_url, filename=filename)
         with zipfile.ZipFile(filename, "r") as zip_ref:
             zip_ref.extractall(extract_dir)
-        print('File now in %s' % extract_dir)
+        log.debug('Wheel extracted: path=%s', extract_dir)
 
         autoapi_dirs = []
         for possible_project in os.listdir(extract_dir):
             if '__init__.py' in os.listdir(os.path.join(extract_dir, possible_project)):
                 autoapi_dirs.append(os.path.join(extract_dir, possible_project))
-        print('Autoapi now in %s' % autoapi_dirs)
+        log.debug('AutoAPI paths detected: paths=%s', autoapi_dirs)
 
         conf_filename = os.path.join(extract_dir, 'conf.py')
         with open(conf_filename, 'w+') as conf_file:
@@ -65,7 +65,7 @@ def _build_docs(project, version, project_url, project_filename, releases):
                 python_path=settings.ROOT_DIR(),
             ))
             conf_file.write(to_write)
-        print('Conf File now in %s' % conf_filename)
+        log.debug('Sphinx conf.py generated: path=%s', conf_filename)
 
         index_filename = os.path.join(extract_dir, 'index.rst')
         with open(index_filename, 'w+') as index_file:
@@ -74,19 +74,18 @@ def _build_docs(project, version, project_url, project_filename, releases):
                 version=version,
             ))
             index_file.write(to_write)
-        print('Index File now in %s' % index_filename)
+        log.debug('Index file generated: path=%s', index_filename)
 
         outdir = settings.DOCS_DIR.path(directory_name)
         if not os.path.exists(outdir.root):
             os.makedirs(outdir.root)
-        print('Running Sphinx')
         sphinx_command = 'sphinx-build -b html ' \
             '-d {root}_build/{name}-doctrees {root} {outdir}'.format(
                 outdir=outdir.root,
                 root=extract_dir,
                 name=directory_name
             )
-        print(sphinx_command)
+        log.debug('Executing Sphinx: cmd=%s', sphinx_command)
         os.system(sphinx_command)
 
 
@@ -106,26 +105,9 @@ def get_package(package, create=False):
     return package
 
 
-def get_package_json(package):
-    package_resp = requests.get(
-        'https://pypi.python.org/pypi/{name}/json'.format(name=package)
-    )
-    if package_resp.status_code != 200:
-        print('Invalid Status code on {}: {}'.format(package, package_resp.status_code))
-        return ''
-    try:
-        resp_json = package_resp.json()
-        resp_json['info']['name'] = resp_json['info']['name'].lower()
-        return resp_json
-    except Exception as e:
-        print('JSON Error: {}'.format(e))
-    return ''
-
-
 def update_package_list(url=None):
     index = PackageIndex.objects.first()
     for package_name in index.client.list_packages():
-        print('Adding %s' % package_name)
         package, created = Package.objects.get_or_create(index=index, name=package_name.lower())
 
 
@@ -133,15 +115,19 @@ def update_package(package, create=True, update_releases=True,
                    update_distributions=True, mirror_distributions=False):
     package_obj = get_package(package, create=create)
     if update_releases:
-        package_json = get_package_json(package_obj.name)
-        if not package_json:
+        package_data = get_package_data(package_obj.name)
+        if not package_data or 'releases' not in package_data:
             return
-        for release, data in package_json['releases'].items():
+        for release, data in package_data['releases'].items():
             for dist in data:
                 create_or_update_release(
-                    package, release, package_info=package_json['info'], data=dist,
+                    package,
+                    release,
+                    package_info=package_data['info'],
+                    data=dist,
                     update_distributions=update_distributions,
-                    mirror_distributions=mirror_distributions)
+                    mirror_distributions=mirror_distributions
+                )
 
 
 def create_or_update_release(package, release, package_info=None, data=None,
@@ -150,14 +136,13 @@ def create_or_update_release(package, release, package_info=None, data=None,
     package = get_package(package, create=True)
     if len(release) > 128:
         # TODO: more general validation and save to statistics
-        print('ERR: Release too long: {}'.format(release))
+        log.error('Release name too long: release=%s', release)
         return
     release_obj, created = Release.objects.get_or_create(package=package,
                                                          version=release)
 
     release_obj.package_info = package_info
     release_obj.save()
-    print('Updating release {}'.format(release_obj))
     update_data = {
         'filename': data['filename'],
         'md5_digest': data['md5_digest'],
@@ -168,7 +153,7 @@ def create_or_update_release(package, release, package_info=None, data=None,
     }
     if len(data['filename']) > 128:
         # TODO: more general validation and save to statistics
-        print('ERR: Release too long: {}'.format(release))
+        log.error('Package filename too long: filename=%s', data['filename'])
         return
     distribution, created = Distribution.objects.get_or_create(
         release=release_obj,
@@ -189,7 +174,7 @@ def updated_packages_since(since):
     packages = {}
     for item in client.changelog(timestamp):
         packages[item[0]] = True
-    print('{} packages updated since {}'.format(len(packages), since))
+    log.info('Packages updated updated: count=%d since=%s', len(packages), since)
     return packages.keys()
 
 
