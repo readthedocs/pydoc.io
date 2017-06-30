@@ -263,7 +263,7 @@ def handle_build(packages, version='', latest=False, built=True):
         else:
             log.error(
                 'Latest version package already built: package=%s version=%s',
-                package, version
+                packages[0], version
             )
     else:
         for package in queryset:

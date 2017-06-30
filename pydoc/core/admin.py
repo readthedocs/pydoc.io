@@ -1,6 +1,7 @@
 from django.contrib import admin
-from pydoc.core.models import Package, Release, Classifier, \
-    Distribution, PackageIndex
+
+from .models import Package, Release, Classifier, Distribution, PackageIndex
+from .tasks import handle_build
 
 
 class PackageIndexAdmin(admin.ModelAdmin):
@@ -18,9 +19,6 @@ class PackageIndexAdmin(admin.ModelAdmin):
                 package_index.update_package_list(full=False)
 
 
-admin.site.register(PackageIndex, PackageIndexAdmin)
-
-
 class PackageReleaseInline(admin.TabularInline):
     model = Release
     extra = 0
@@ -32,7 +30,8 @@ class PackageAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'updated_from_remote_at', 'parsed_external_links_at',)
     search_fields = ('name',)
     inlines = (PackageReleaseInline,)
-    actions = ('update_release_metadata', 'update_external_release_metadata',)
+    actions = ('update_release_metadata', 'update_external_release_metadata',
+               'build_package')
 
     def update_release_metadata(self, request, queryset):
         for package in queryset:
@@ -42,12 +41,21 @@ class PackageAdmin(admin.ModelAdmin):
         for package in queryset:
             package.update_external_release_metadata()
 
+    def build_package(self, request, queryset):
+        for package in queryset:
+            handle_build([package.name], latest=True)
+
 
 class ReleaseAdmin(admin.ModelAdmin):
     list_display = ('package', 'version', 'built', 'is_from_external',)
     search_fields = ('package__name', 'version',)
     list_filter = ('built', 'is_from_external',)
     raw_id_fields = ('package',)
+    actions = ('build_release',)
+
+    def build_release(self, request, queryset):
+        for release in queryset:
+            handle_build([release.package.name], version=release.version)
 
 
 class DistributionAdmin(admin.ModelAdmin):
@@ -71,6 +79,7 @@ class DistributionAdmin(admin.ModelAdmin):
             distribution.mirror_package(commit=True)
 
 
+admin.site.register(PackageIndex, PackageIndexAdmin)
 admin.site.register(Package, PackageAdmin)
 admin.site.register(Release, ReleaseAdmin)
 admin.site.register(Distribution, DistributionAdmin)
