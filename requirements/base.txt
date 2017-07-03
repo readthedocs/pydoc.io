@@ -42,3 +42,5 @@ celery==3.1.25
 
 docutils==0.12
 sphinx>=1.4
+
+semver==2.7.7

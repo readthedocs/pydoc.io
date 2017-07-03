@@ -3,10 +3,12 @@
 from django.core.management.base import BaseCommand
 
 from pydoc.core.tasks import handle_build
+from pydoc.core.models import Release
 
 
 class Command(BaseCommand):
-    help = """Build docs passed in."""
+
+    help = __doc__
 
     def add_arguments(self, parser):
         parser.add_argument('args', nargs='*')
@@ -28,4 +30,5 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        handle_build(packages=args, latest=options['latest'], built=options['built'])
+        releases = Release.objects.get_latest(args)
+        handle_build(releases, built=options['built'])

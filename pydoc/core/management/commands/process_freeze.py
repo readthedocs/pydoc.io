@@ -1,24 +1,27 @@
-"""
-Management command for loading all the known packages from the official
-pypi.
-"""
+"""Build packages from pip freeze output"""
 
 import sys
+import logging
 
 from django.core.management.base import BaseCommand
 
+from pydoc.core.models import Release
 from pydoc.core.tasks import handle_build
 
 
 class Command(BaseCommand):
-    help = """Build docs from pip freeze output"""
+
+    help = __doc__
 
     def handle(self, *args, **options):
+        # TODO this could probably be replace with actual parsing of freeze
+        # output through pip import
+        pairs = []
         for line in sys.stdin:
             line = line.strip()
             if not line or '#' in line:
                 continue
-            print(line)
             package, version = line.split('==')
-            print("Building %s:%s" % (package, version))
-            handle_build(packages=[package], version=version, built=False)
+            pairs.append((package, version))
+        releases = Release.objects.get_pairs(pairs)
+        handle_build(releases, built=False)

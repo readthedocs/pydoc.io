@@ -1,7 +1,9 @@
+from functools import cmp_to_key
 from django.contrib import admin
 
 from .models import Package, Release, Classifier, Distribution, PackageIndex
-from .tasks import handle_build
+from .tasks import build
+from .utils import sort_versions
 
 
 class PackageIndexAdmin(admin.ModelAdmin):
@@ -43,7 +45,9 @@ class PackageAdmin(admin.ModelAdmin):
 
     def build_package(self, request, queryset):
         for package in queryset:
-            handle_build([package.name], latest=True)
+            release = packages.releases.highest_version()
+            if release:
+                build.delay(release_pk=release_pk)
 
 
 class ReleaseAdmin(admin.ModelAdmin):
@@ -55,7 +59,7 @@ class ReleaseAdmin(admin.ModelAdmin):
 
     def build_release(self, request, queryset):
         for release in queryset:
-            handle_build([release.package.name], version=release.version)
+            build.delay(release_pk=release.pk)
 
 
 class DistributionAdmin(admin.ModelAdmin):

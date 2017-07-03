@@ -13,6 +13,7 @@ import urllib.request
 import xmlrpc.client
 import zipfile
 from queue import Queue
+from typing import List
 
 import requests
 from celery import shared_task
@@ -22,7 +23,7 @@ from django.template.loader import get_template
 
 from .models import Release, Package, Distribution, PackageIndex
 from .utils import get_package_data, get_highest_version
-
+from .conf import TYPE_WHEEL
 
 log = logging.getLogger(__name__)
 
@@ -35,30 +36,41 @@ except NameError:
     basestring = str
 
 
-def _build_docs(project, version, project_url, project_filename, releases):
+def build_release(release):
+    # TODO refactor these variables
+    package = release.package.name
+    version = release.version
+    releases = release.package.releases.filter(built=True)
+    try:
+        dist = release.distributions.get(filetype=TYPE_WHEEL)
+        dist_url = dist.url
+        dist_filename = dist.filename
+    except Distribution.DoesNotExist:
+        return False
+
     conf_template = get_template('sphinx/conf.py.tmpl')
     index_template = get_template('sphinx/index.rst.tmpl')
 
     with tempfile.TemporaryDirectory() as tmp_dir:
-        directory_name = "{name}-{version}".format(name=project, version=version)
-        filename = os.path.join(tmp_dir, project_filename)
+        directory_name = "{name}-{version}".format(name=package, version=version)
+        filename = os.path.join(tmp_dir, dist_filename)
         extract_dir = os.path.join(tmp_dir, directory_name)
-        urllib.request.urlretrieve(project_url, filename=filename)
+        urllib.request.urlretrieve(dist_url, filename=filename)
         with zipfile.ZipFile(filename, "r") as zip_ref:
             zip_ref.extractall(extract_dir)
         log.debug('Wheel extracted: path=%s', extract_dir)
 
         autoapi_dirs = []
-        for possible_project in os.listdir(extract_dir):
-            if '__init__.py' in os.listdir(os.path.join(extract_dir, possible_project)):
-                autoapi_dirs.append(os.path.join(extract_dir, possible_project))
+        for possible_module in os.listdir(extract_dir):
+            if '__init__.py' in os.listdir(os.path.join(extract_dir, possible_module)):
+                autoapi_dirs.append(os.path.join(extract_dir, possible_module))
         log.debug('AutoAPI paths detected: paths=%s', autoapi_dirs)
 
         conf_filename = os.path.join(extract_dir, 'conf.py')
         with open(conf_filename, 'w+') as conf_file:
             to_write = conf_template.render(dict(
                 autoapi_dirs=json.dumps(autoapi_dirs),
-                project=project,
+                package=package,
                 version=version,
                 releases=releases,
                 output_directory=settings.JSON_DIR(),
@@ -70,7 +82,7 @@ def _build_docs(project, version, project_url, project_filename, releases):
         index_filename = os.path.join(extract_dir, 'index.rst')
         with open(index_filename, 'w+') as index_file:
             to_write = index_template.render(dict(
-                project=project,
+                package=package,
                 version=version,
             ))
             index_file.write(to_write)
@@ -79,6 +91,7 @@ def _build_docs(project, version, project_url, project_filename, releases):
         outdir = settings.DOCS_DIR.path(directory_name)
         if not os.path.exists(outdir.root):
             os.makedirs(outdir.root)
+        # TODO Run as an application, not as a shell command here
         sphinx_command = 'sphinx-build -b html ' \
             '-d {root}_build/{name}-doctrees {root} {outdir}'.format(
                 outdir=outdir.root,
@@ -205,59 +218,29 @@ def thread_update(queryset, task, thread_count=20, **kwargs):
 
 
 def build_changelog(**time_kwargs):
+    # TODO this should pick out versions if possible, not just rely on `latest`
+    # being the version that was updated
     since = datetime.datetime.utcnow() - datetime.timedelta(**time_kwargs)
     packages = updated_packages_since(since)
-    for package in packages:
-        handle_build([package], latest=True, built=False)
+    releases = Release.objects.get_latest(packages)
+    # TODO force builds here on not built?
+    handle_build(releases, built=False)
 
 
-def handle_build(packages, version='', latest=False, built=True):
-    if packages:
-        # Create objects that don't exist
-        for arg in packages:
-            update_package(arg, create=True)
-        queryset = Package.objects.filter(name__in=packages)
-    else:
-        queryset = Package.objects.all()
+def handle_build(releases: List[Release], built=True):
+    """Trigger build on releases
 
-    if not queryset.exists():
-        print('No queryset')
-        return None
-
-    if latest:
-        for package in queryset:
-            versions = []
-            for rel in package.releases.all():
-                versions.append(rel.version)
-            if versions:
-                highest_version = sorted(versions)[-1]
-                if not package.releases.filter(version=highest_version, built=built).exists():
-                    build.delay(project=package.name, version=highest_version)
-                else:
-                    log.error(
-                        'Latest version package already built: package=%s version=%s',
-                        package, highest_version
-                    )
-            else:
-                print("No versions; {}".format(package))
-
-    elif version:
-        print("updating %s:%s" % (packages[0], version))
-        if queryset and not queryset[0].releases.filter(version=version, built=built).exists():
-            build.delay(project=packages[0], version=version)
-        else:
+    :param releases: List of releases to build
+    :param built: Only build release if not built already
+    """
+    for release in releases:
+        if built and release.built:
             log.error(
                 'Latest version package already built: package=%s version=%s',
-                packages[0], version
+                package, release.version
             )
-    else:
-        for package in queryset:
-            qs = package.releases.all()
-            if built:
-                qs = qs.filter(built=True)
-            for release in qs:
-                print("updating %s:%s" % (package, release))
-                build.delay(project=release.package.name, version=release.version)
+        else:
+            build.delay(release_pk=release.pk)
 
 
 def update_popular():
@@ -275,27 +258,20 @@ def update_popular():
 
 
 @shared_task
-def build(project, version=None):
-    if not version:
-        version = get_highest_version(project)
-
-    release = Release.objects.get(package__name=project, version=version)
-    releases = Release.objects.filter(package__name=project, built=True)
+def build(release_pk):
     try:
-        dist = release.distributions.get(filetype='bdist_wheel')
-        project_url = dist.url
-        project_filename = dist.filename
-    except Exception:
-        print("No valid wheel found. Skipping: {}".format(release))
-        raise
-
-    _build_docs(project, version, project_url, project_filename, releases)
-
-    directory_name = "{name}-{version}".format(name=project, version=version)
-    outdir = settings.DOCS_DIR.path(directory_name)
-    if os.path.exists(os.path.join(outdir.root, 'index.html')):
-        release.built = True
-        release.save()
+        release = Release.objects.get(
+            distributions__filetype=TYPE_WHEEL,
+            pk=release_pk,
+        )
+        # TODO move this to build_release?
+        result = build_release(release)
+        if result:
+            release.built = True
+            release.save()
+    except Release.DoesNotExist:
+        log.info('Release does not include wheel distributions: release=%s',
+                 release_pk)
 
 
 @shared_task

@@ -21,6 +21,7 @@ from django.core.cache import cache
 from django.template.loader import get_template
 
 from .models import Release, Package, Distribution, PackageIndex
+from .querysets import sort_versions
 
 
 log = logging.getLogger(__name__)
@@ -62,6 +63,5 @@ def get_highest_version(package, data=None):
         return None
     if not versions:
         return None
-    # TODO replace with semver sorting
-    version = sorted(versions)[-1]
+    version = versions.sort(key=sort_versions)[-1]
     return version

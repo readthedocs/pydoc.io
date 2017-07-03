@@ -45,14 +45,21 @@ ARCHITECTURES = (
     ("ultrasparc", "UltraSparc"),
 )
 
+TYPE_SDIST = 'sdist'
+TYPE_WHEEL = 'bdist_wheel'
+TYPE_DUMB = 'bdist_dumb'
+TYPE_RPM = 'bdist_rpm'
+TYPE_WININST = 'bdist_wininst'
+TYPE_EGG = 'bdist_egg'
+TYPE_DMG = 'bdist_dmg'
 DIST_FILE_TYPES = (
-    ('sdist', 'Source'),
-    ('bdist_wheel', 'Wheel'),
-    ('bdist_dumb', '"dumb" binary'),
-    ('bdist_rpm', 'RPM'),
-    ('bdist_wininst', 'MS Windows installer'),
-    ('bdist_egg', 'Python Egg'),
-    ('bdist_dmg', 'OS X Disk Image'),
+    (TYPE_SDIST, 'Source'),
+    (TYPE_WHEEL, 'Wheel'),
+    (TYPE_DUMB, '"dumb" binary'),
+    (TYPE_RPM, 'RPM'),
+    (TYPE_WININST, 'MS Windows installer'),
+    (TYPE_EGG, 'Python Egg'),
+    (TYPE_DMG, 'OS X Disk Image'),
 )
 
 PYTHON_VERSIONS = (

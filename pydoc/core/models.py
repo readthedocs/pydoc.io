@@ -13,12 +13,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.postgres.fields import JSONField
 
 from . import conf
-
+from .querysets import ReleaseQuerySet
 
 try:
     basestring
 except NameError:
     basestring = str
+
 
 PYPI_API_URL = 'https://pypi.python.org/pypi'
 PYPI_SIMPLE_URL = 'https://pypi.python.org/simple'
@@ -107,10 +108,12 @@ class Release(models.Model):
 
     is_from_external = models.BooleanField(default=False)
 
+    objects = ReleaseQuerySet.as_manager()
+
     class Meta:
-        verbose_name = _(u"release")
-        verbose_name_plural = _(u"releases")
-        unique_together = ("package", "version")
+        verbose_name = _('release')
+        verbose_name_plural = _('releases')
+        unique_together = ('package', 'version')
         get_latest_by = 'distributions__uploaded_at'
         ordering = ['-distributions__uploaded_at']
 

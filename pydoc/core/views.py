@@ -7,7 +7,7 @@ from .forms import PackageForm
 from .models import Release, Distribution, Package
 from .tasks import handle_build, update_package, update_popular
 from .utils import get_highest_version
-
+from .conf import TYPE_WHEEL
 
 class HomeView(TemplateView):
     template_name = "pages/home.html"
@@ -45,20 +45,25 @@ class BuildView(View):
             package = form.cleaned_data['package']
             version = form.get_version()
             if version:
+                # TODO the following should be an async task and should avoid
+                # form validation
                 update_package(package)
-                dists = Distribution.objects.filter(
-                    release__package__name=package,
-                    release__version=version,
-                    filetype='bdist_wheel'
-                )
-                if dists.exists():
-                    success = True
-                    handle_build(packages=[package], latest=True)
-                else:
+                try:
+                    release = (
+                        Release.objects
+                        .get(
+                            distributions__filetype=BDIST_WHEEL,
+                            release__package__name=package,
+                            release__version=version,
+                        ))
+                except Release.DoesNotExist:
                     form.add_error(
                         'package',
                         'This package release has no wheels available'
                     )
+                else:
+                    success = True
+                    handle_build([release])
         return render(request, self.template_name, {
             'form': form, 'success': success, 'tried': tried
         })

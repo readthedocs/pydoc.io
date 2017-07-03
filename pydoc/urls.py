@@ -19,7 +19,6 @@ urlpatterns = [
     url(r'^search/$', core_views.ProjectSearchView.as_view(), name='search'),
     url(settings.ADMIN_URL, admin.site.urls),
     url(r'^accounts/', include('allauth.urls')),
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += static('/pypi/', document_root=str(settings.DOCS_DIR))
