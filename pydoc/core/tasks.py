@@ -237,7 +237,7 @@ def handle_build(releases: List[Release], built=True):
         if built and release.built:
             log.error(
                 'Latest version package already built: package=%s version=%s',
-                package, release.version
+                release.package, release.version
             )
         else:
             build.delay(release_pk=release.pk)

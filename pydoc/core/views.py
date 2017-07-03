@@ -9,6 +9,7 @@ from .tasks import handle_build, update_package, update_popular
 from .utils import get_highest_version
 from .conf import TYPE_WHEEL
 
+
 class HomeView(TemplateView):
     template_name = "pages/home.html"
     title = "Pydoc Home"
@@ -52,7 +53,7 @@ class BuildView(View):
                     release = (
                         Release.objects
                         .get(
-                            distributions__filetype=BDIST_WHEEL,
+                            distributions__filetype=TYPE_WHEEL,
                             release__package__name=package,
                             release__version=version,
                         ))

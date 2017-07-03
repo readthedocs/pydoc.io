@@ -45,9 +45,9 @@ class PackageAdmin(admin.ModelAdmin):
 
     def build_package(self, request, queryset):
         for package in queryset:
-            release = packages.releases.highest_version()
+            release = package.releases.highest_version()
             if release:
-                build.delay(release_pk=release_pk)
+                build.delay(release_pk=release.pk)
 
 
 class ReleaseAdmin(admin.ModelAdmin):
