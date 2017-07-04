@@ -25,8 +25,9 @@
               <div class="nav-search six columns">
                 {% block nav-search %}
                   <form method="post" action="/search/">
-                    <label for="search">{% trans "Package name" %}</label>
-                    <input type="text" name="search" id="search" placeholder="requests" />
+                    {% csrf_token %}
+                    <label for="package">{% trans "Package name" %}</label>
+                    <input type="text" name="package" id="package" placeholder="requests" />
                   </form>
                 {% endblock %}
               </div>

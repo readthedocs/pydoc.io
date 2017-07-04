@@ -1,32 +1,45 @@
 {% extends "base.html" %}
-{% load core_tags %}
 
+{% load core_tags %}
+{% load i18n %}
 
 {% block content %}
 
-
-<form method="GET" action=".">
-    <table>
+  <form method="post">
+    {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Find it!" />
+    <input type="submit" class="button-primary" value="{% trans "Find package" %}" />
+  </form>
+
+  {% if package_list %}
+    <table class="search-results">
+      <thead>
+        <tr>
+          <th>{% trans "Package" %}</th>
+          <th>{% trans "Description" %}</th>
+          <th>{% trans "Releases" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for package in package_list %}
+          <tr>
+            <td class="package-name">{{ package.name }}</td>
+            <td class="package-summary">{{ package.releases.latest.summary }}</td>
+            <td class="package-versions">
+              {% with releases=package.releases.all %}
+                {% for release in releases %}
+                  {% if release.built %}
+                    {{ release.version }}
+                  {% endif %}
+                {% endfor %}
+              {% endwith %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
-</form>
-
-<hr>
-<h3> Results </h3>
-
-{% if releases %}
-    {% for release in releases %}
-        {% filter restructuredtext %}
-
-        * `{{ release.release_name }} </pypi/{{ release.release_name }}/index.html>`_
-
-        {% endfilter %}
-    {% endfor %}
-{% else %}
-
-No projects found.
-
-{% endif %}
+  {% else %}
+    No projects found.
+  {% endif %}
 
 {% endblock content %}

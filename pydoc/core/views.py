@@ -1,9 +1,11 @@
 from django.core.cache import cache
+from django.db.models import Q, Case, When, Value, IntegerField
 from django.shortcuts import render
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import ListView, TemplateView
+from django.views.generic.edit import FormView, FormMixin
 
-from .forms import PackageForm
+from .forms import BuildPackageForm, SearchPackageForm
 from .models import Release, Distribution, Package
 from .tasks import handle_build, update_package, update_popular
 from .utils import get_highest_version
@@ -30,7 +32,7 @@ class HomeView(TemplateView):
 
 
 class BuildView(View):
-    form_class = PackageForm
+    form_class = BuildPackageForm
     template_name = "pages/build.html"
     title = "Pydoc Build"
 
@@ -70,10 +72,39 @@ class BuildView(View):
         })
 
 
-class ProjectSearchView(View):
-    form_class = PackageForm
-    template_name = "pages/search.html"
+class PackageSearchView(FormMixin, ListView):
 
+    form_class = SearchPackageForm
+    template_name = "pages/search.html"
+    model = Package
+    paginate_by = 25
+
+    def get_queryset(self):
+        if not getattr(self, 'search', None):
+            return self.model.objects.none()
+        return (
+            self.model.objects
+            .annotate(score=Case(
+                When(name=self.search, then=Value(10)),
+                When(name__startswith=self.search, then=Value(5)),
+                When(name__contains=self.search, then=Value(2)),
+                When(name__icontains=self.search, then=Value(1)),
+                default_value=Value(0),
+                output_field=IntegerField(),
+            ))
+            .filter(score__gte=1, releases__distributions__filetype=TYPE_WHEEL)
+            .order_by('-score', 'name')
+        )
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        self.search = None
+        if form.is_valid():
+            self.search = form.cleaned_data.get('package')
+        self.object_list = self.get_queryset()
+        return self.render_to_response(self.get_context_data())
+
+    """
     def get(self, request, *args, **kwargs):
         query = request.GET.get('package')
         if query:
@@ -86,3 +117,4 @@ class ProjectSearchView(View):
                 {'form': form, 'releases': rels}
             )
         return render(request, self.template_name, {'form': self.form_class()})
+    """

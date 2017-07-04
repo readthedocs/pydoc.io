@@ -528,7 +528,8 @@ form {
 }
 /* Utilities
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-.u-full-width {
+.u-full-width,
+div.container table {
   width: 100%;
   box-sizing: border-box;
 }
@@ -727,3 +728,4 @@ footer ul li {
 footer ul li:first-child {
   margin-left: 0em;
 }
+/* Elements */

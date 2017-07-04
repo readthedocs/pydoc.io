@@ -11,8 +11,8 @@
       <p>{% trans "Find reference documentation for Python packages" %}</p>
       <form method="post" action="{% url "search" %}">
         {% csrf_token %}
-        <label for="search">{% trans "Package name" %}</label>
-        <input type="text" name="search" id="search" placeholder="requests" />
+        <label for="package">{% trans "Package name" %}</label>
+        <input type="text" name="package" id="package" placeholder="requests" />
       </form>
     </div>
     <div class="packages-metadata four columns">

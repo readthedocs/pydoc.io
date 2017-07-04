@@ -9,6 +9,13 @@ class PackageForm(forms.Form):
 
     package = forms.CharField(label='Package', max_length=100)
 
+
+class SearchPackageForm(PackageForm):
+    pass
+
+
+class BuildPackageForm(PackageForm):
+
     def clean_package(self):
         package = self.cleaned_data['package']
         self.version = get_highest_version(package)
