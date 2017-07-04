@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load core_tags %}
+{% load i18n %}
 
 {% block nav-search %}
 {% endblock %}
@@ -7,22 +8,22 @@
 {% block container-top-extra %}
   <div class="row">
     <div class="packages-search eight columns">
-      <p>Find reference documentation for Python packages</p>
-      <form method="post" action="/search/">
+      <p>{% trans "Find reference documentation for Python packages" %}</p>
+      <form method="post" action="{% url "search" %}">
         {% csrf_token %}
-        <label for="search">Package name</label>
+        <label for="search">{% trans "Package name" %}</label>
         <input type="text" name="search" id="search" placeholder="requests" />
       </form>
     </div>
     <div class="packages-metadata four columns">
-      <h2>Recent packages</h2>
+      <h2>{% trans "Recent packages" %}</h2>
 
       {% with releases=view.releases %}
         {% if releases %}
           <ul>
             {% for release in releases|slice:':6' %}
               <li>
-                <a href="/pypi/{{ release.release_name }}/index.html">{{ release.release_name }}</a>
+                <a href="/pypi/{{ release.release_name }}/index.html">{{ release.package.name }} {{ release.version }}</a>
               </li>
             {% endfor %}
 
@@ -37,7 +38,7 @@
 
       {% with popular=view.popular %}
         {% if popular %}
-          <h2>Popular packages</h2>
+          <h2>{% trans "Popular packages" %}</h2>
 
           <ul>
             {% for release in popular|slice:':6' %}
@@ -53,20 +54,15 @@
 {% endblock %}
 
 {% block content %}
-{% filter restructuredtext %}
-
-Welcome to Pydoc
-================
-
-Thanks for checking out Pydoc.
-
-Below you will find the API documentation for Python packages that have been uploaded to PyPI.
-We currently only support packages uploaded at wheels,
-and that support Python 3.
-This is the future of the ecosystem,
-so we are supporting these formats first because we think they are best practices.
-
-You can find more packages by `searching for them <{% url 'search' %}>`_.
-
-{% endfilter %}
+  <div class="row">
+    <div class="four columns">
+      <h2>Stuff</h2>
+    </div>
+    <div class="four columns">
+      <h2>Stuff</h2>
+    </div>
+    <div class="four columns">
+      <h2>Stuff</h2>
+    </div>
+  </div>
 {% endblock content %}
