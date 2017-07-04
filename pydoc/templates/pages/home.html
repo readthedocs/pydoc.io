@@ -1,6 +1,57 @@
 {% extends "base.html" %}
 {% load core_tags %}
 
+{% block nav-search %}
+{% endblock %}
+
+{% block container-top-extra %}
+  <div class="row">
+    <div class="packages-search eight columns">
+      <p>Find reference documentation for Python packages</p>
+      <form method="post" action="/search/">
+        {% csrf_token %}
+        <label for="search">Package name</label>
+        <input type="text" name="search" id="search" placeholder="requests" />
+      </form>
+    </div>
+    <div class="packages-metadata four columns">
+      <h2>Recent packages</h2>
+
+      {% with releases=view.releases %}
+        {% if releases %}
+          <ul>
+            {% for release in releases|slice:':6' %}
+              <li>
+                <a href="/pypi/{{ release.release_name }}/index.html">{{ release.release_name }}</a>
+              </li>
+            {% endfor %}
+
+            {% with release_count=releases|length %}
+              {% if release_count > 6 %}
+                <li>... {{ release_count|add:"-6" }} more releases</li>
+              {% endif %}
+            {% endwith %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      {% with popular=view.popular %}
+        {% if popular %}
+          <h2>Popular packages</h2>
+
+          <ul>
+            {% for release in popular|slice:':6' %}
+              <li>
+                <a href="/pypi/{{ release.release_name }}/index.html">{{ release.package.name }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}
+
 {% block content %}
 {% filter restructuredtext %}
 
@@ -17,34 +68,5 @@ so we are supporting these formats first because we think they are best practice
 
 You can find more packages by `searching for them <{% url 'search' %}>`_.
 
-Packages
---------
-
-So far we have built {{ view.projects.count }} projects.
-
-
 {% endfilter %}
-
-<h2> Popular Packages </h2>
-
-{% for release in view.popular|slice:':10' %}
-
-{% filter restructuredtext %}
-
-* `{{ release.release_name }} </pypi/{{ release.release_name }}/index.html>`_
-
-{% endfilter %}
-{% endfor %}
-
-<h2> Recently Built Packages </h2>
-
-{% for release in view.projects|slice:':10' %}
-{% filter restructuredtext %}
-
-* `{{ release.release_name }} </pypi/{{ release.release_name }}/index.html>`_
-
-{% endfilter %}
-{% endfor %}
-
-
 {% endblock content %}

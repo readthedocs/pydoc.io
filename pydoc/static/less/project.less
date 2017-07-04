@@ -1,0 +1,154 @@
+@import 'Skeleton-Less/less/skeleton';
+
+@primary-color: #1f295f;
+@secondary-color: #33c3f0;
+@font-family: "Droid Serif";
+
+body {
+    margin: 0em;
+}
+
+a {
+    text-decoration: none;
+    box-shadow: inset 0rem -.2rem fadeout(@secondary-color, 50%);
+    -ms-transition: box-shadow .5s;
+    -webkit-transition: box-shadow .5s;
+    transition: box-shadow .5s;
+
+    &:link, &:visited, &:hover, &:active {
+        color: @primary-color;
+    }
+
+    &:hover, &:active, &:focus {
+        box-shadow: inset 0rem -.6rem fadeout(@secondary-color, 50%);
+    }
+}
+
+/* Nav */
+nav {
+    padding: 1em 0em;
+
+    font-family: sans-serif;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+
+    div.nav-logo span {
+        font-size: 1.5rem;
+        line-height: 3.5rem;
+
+    }
+
+    div.nav-search {
+        text-align: right;
+
+        form {
+            margin-bottom: 0em;
+
+            input[type=text] {
+                font-size: 1.5rem;
+                margin-bottom: 0em;
+                height: initial;
+                padding: 1rem;
+                line-height: 2rem;
+            }
+        }
+    }
+}
+
+div.wrapper-top {
+    margin-bottom: 2em;
+
+    background: @primary-color;
+    background: -moz-linear-gradient(-45deg, @primary-color 0%, @secondary-color 100%);
+    background: -webkit-linear-gradient(-45deg, @primary-color 0%, @secondary-color 100%);
+    background: linear-gradient(135deg, @primary-color 0%, @secondary-color 100%);
+    color: #fff;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+
+    a {
+        box-shadow: inset 0rem -.2rem fadeout(#fff, 80%);
+
+        &:link, &:visited, &:hover, &:active {
+            color: #fff;
+        }
+
+        &:hover, &:active, &:focus {
+            box-shadow: inset 0rem -.6rem fadeout(#fff, 80%);
+        }
+    }
+
+    div.packages-search {
+        padding-top: 1em;
+        padding-bottom: 1em;
+        @media (min-width: @bp-larger-than-phablet) {
+            padding-top: 10em;
+            padding-bottom: 10em;
+        }
+        text-align: center;
+
+        p {
+            font-size: 2.4rem;
+        }
+
+        form {
+            box-sizing: box-model;
+
+            input[type=text] {
+                width: 80%;
+                max-width: 30em;
+
+                &:active, &:focus {
+                    outline: none;
+                }
+            }
+
+            input[type=text],
+            button {
+                line-height: 24px;
+            }
+        }
+    }
+
+    div.packages-metadata {
+        h2 {
+            font-size: 2.3rem;
+            margin-bottom: .5em;
+        }
+
+        ul li {
+            margin: 0em;
+        }
+    }
+}
+
+/* Common search */
+nav div.nav-search,
+div.wrapper-top div.packages-search {
+    form {
+        label {
+            display: none;
+        }
+
+        input[type=text] {
+            border: none;
+            box-shadow: none;
+            font-family: @font-family;
+            &:before {
+                content: 'fuck';
+            }
+        }
+
+        button {
+            border-color: #fff;
+            color: #fff;
+            background: transparent;
+
+            &:hover, &:active, &:focus {
+                background: rgba(0, 0, 0, 0.15);
+                border-color: #fff;
+                color: #fff;
+            }
+        }
+    }
+}

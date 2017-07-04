@@ -1,0 +1,21 @@
+{
+  "name": "pydoc",
+  "description": "Pydoc.io",
+  "main": "",
+  "authors": [
+    "Anthony Johnson <aj@ohess.org>"
+  ],
+  "license": "GPL-V3",
+  "homepage": "https://github.com/rtfd/pydoc.io",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "Skeleton-Less": "skeleton-less#*"
+  }
+}

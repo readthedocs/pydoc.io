@@ -14,7 +14,7 @@ class HomeView(TemplateView):
     template_name = "pages/home.html"
     title = "Pydoc Home"
 
-    def projects(self):
+    def releases(self):
         return Release.objects.filter(built=True)
 
     def popular(self):

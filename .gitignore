@@ -1,42 +1,24 @@
-### OSX ###
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Basics
 *.py[cod]
 __pycache__
-
-# Logs
+.ropeproject/
+pip-selfcheck.json
 logs
 *.log
 pip-log.txt
 npm-debug.log*
-
-# Unit test / coverage reports
 .coverage
 .tox
 nosetests.xml
 htmlcov
-
-# Translations
 *.mo
 *.pot
-
-# npm
 node_modules/
-
-# Compass
-.sass-cache
-
-# virtual environments
 .env
-
-# User-uploaded media
 pydoc/media/
-
-# Local settings overries
 pydoc/settings/local_settings.py
-
 .cache
 celerybeat-schedule
+bower_components/
