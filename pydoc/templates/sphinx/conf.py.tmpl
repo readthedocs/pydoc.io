@@ -16,9 +16,8 @@ release = version
 
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-html_theme_options = {
-    'analytics_id':  'UA-17997319-4',
-}
+googleanalytics_id = 'UA-17997319-4'
+googleanalytics_enabled = True
 
 # Don't show module names in docs
 add_module_names = False
@@ -48,8 +47,8 @@ copyright = u'2016'
 
 html_context = {
     'output_directory': '{{ output_directory }}',
-    'analytics_code' = 'UA-17997319-4',
-    'user_analytics_code' = 'UA-17997319-4',
+    'analytics_code': 'UA-17997319-4',
+    'user_analytics_code': 'UA-17997319-4',
     'versions': [
     {% for release in releases %}
     ("{{ release.version }}", "/pypi/{{ release.release_name }}/index.html"),
