@@ -88,7 +88,7 @@ def _build_docs(project, version, project_url, project_filename, releases):
 
 @app.task
 def build(project, version=None):
-    from .utils import get_highest_version
+    from .utils import get_highest_version  # noqa
     from .models import Release
     if not version:
         version = get_highest_version(project)

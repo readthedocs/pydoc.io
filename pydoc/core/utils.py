@@ -71,7 +71,7 @@ def get_package_json(package):
 
 
 def handle_build(packages, version='', latest=False, built=True):
-    from .tasks import build
+    from .tasks import build  # noqa
 
     if packages:
         # Create objects that don't exist
@@ -90,7 +90,7 @@ def handle_build(packages, version='', latest=False, built=True):
             versions = []
             for rel in package.releases.all():
                 versions.append(rel.version)
-            if len(versions):
+            if versions:
                 highest_version = sorted(versions)[-1]
                 build.delay(project=package.name, version=highest_version)
             else:
@@ -221,11 +221,11 @@ def build_changelog(**time_kwargs):
 
 
 def update_popular():
-    API_KEY = getattr(settings, 'LIBRARIES_API_KEY', None)
-    if not API_KEY:
+    api_key = getattr(settings, 'LIBRARIES_API_KEY', None)
+    if not api_key:
         return ()
     url = 'https://libraries.io/api/search/?platforms=Pypi&sort=rank?api_key={key}'.format(
-        key=API_KEY,
+        key=api_key,
     )
     resp = requests.get(url)
     data = resp.json()
