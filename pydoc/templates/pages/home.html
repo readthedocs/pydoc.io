@@ -26,6 +26,7 @@ So far we have built {{ view.projects.count }} projects.
 {% endfilter %}
 
 {% if view.popular %}
+
 <h2> Popular Packages </h2>
 
 {% for release in view.popular|slice:':10' %}
@@ -37,7 +38,7 @@ So far we have built {{ view.projects.count }} projects.
 {% endfilter %}
 {% endfor %}
 
-{% endif view.popular %}
+{% endif %}
 
 <h2> Recently Built Packages </h2>
 
