@@ -262,6 +262,8 @@ CELERYBEAT_SCHEDULE = {
 
 CELERY_TIMEZONE = 'UTC'
 
+LIBRARIES_API_KEY = env('LIBRARIES_API_KEY', default='')
+
 # Location of root django.contrib.admin URL, use {% url 'admin:index' %}
 ADMIN_URL = r'^admin/'
 
