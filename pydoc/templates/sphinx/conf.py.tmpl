@@ -48,4 +48,9 @@ copyright = u'2016'
 
 html_context = {
     'output_directory': '{{ output_directory }}',
+    'versions': [
+    {% for release in releases %}
+    ("{{ release.version }}", "/pypi/{{ release.release_name }}/index.html"),
+    {% endfor %}
+    ]
 }

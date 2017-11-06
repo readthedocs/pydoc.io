@@ -49,6 +49,7 @@ def update_body(app, pagename, templatename, context, doctree):
         to_write.write(json.dumps(to_context, indent=4))
     except Exception as e:
         print('ERRRRRRRRR: ', e)
+        raise
 
 
 def setup(app):
