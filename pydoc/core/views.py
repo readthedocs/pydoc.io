@@ -1,10 +1,10 @@
+from django import forms
 from django.views.generic import TemplateView
 from django.shortcuts import render
 from django.views import View
+from django.core.cache import cache
 
-from django import forms
-
-from pydoc.core.utils import handle_build, get_highest_version, update_package
+from pydoc.core.utils import handle_build, get_highest_version, update_package, update_popular
 from pydoc.core.models import Release, Distribution, Package
 
 
@@ -18,6 +18,17 @@ class HomeView(TemplateView):
 
     def projects(self):
         return Release.objects.filter(built=True)
+
+    def popular(self):
+        releases = set()
+        popular = cache.get('homepage_popular', None) or update_popular()
+        packages = Package.objects.filter(name__in=popular)
+
+        for package in packages:
+            release_qs = package.releases.filter(built=True)
+            if release_qs.exists():
+                releases.add(release_qs.latest())
+        return releases
 
 
 class BuildView(View):

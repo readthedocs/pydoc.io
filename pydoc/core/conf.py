@@ -47,6 +47,7 @@ ARCHITECTURES = (
 
 DIST_FILE_TYPES = (
     ('sdist', 'Source'),
+    ('bdist_wheel', 'Wheel'),
     ('bdist_dumb', '"dumb" binary'),
     ('bdist_rpm', 'RPM'),
     ('bdist_wininst', 'MS Windows installer'),

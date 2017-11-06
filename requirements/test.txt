@@ -2,9 +2,7 @@
 -r base.txt
 
 coverage==4.2
-flake8==3.0.4 
-prospector==0.12.4
-
-# pytest
-pytest-django==3.0.0
-
+pytest
+pytest-django
+prospector==0.12.6
+flake8

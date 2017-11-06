@@ -25,7 +25,7 @@ def restructuredtext(value, short=False):
         docutils_settings.update(getattr(settings, 'RESTRUCTUREDTEXT_FILTER_SETTINGS', {}))
         parts = publish_parts(source=force_bytes(value), writer_name="html4css1",
                               settings_overrides=docutils_settings)
-        out = force_text(parts["fragment"])
+        out = force_text(parts["html_body"])
         try:
             if short:
                 out = out.split("\n")[0]
