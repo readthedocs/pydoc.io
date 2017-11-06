@@ -8,6 +8,8 @@ import threading
 from queue import Queue
 
 import requests
+from django.conf import settings
+from django.core.cache import cache
 
 from .models import Package, Release, Distribution, PackageIndex
 
@@ -69,7 +71,7 @@ def get_package_json(package):
 
 
 def handle_build(packages, version='', latest=False, built=True):
-    from .tasks import build
+    from .tasks import build  # noqa
 
     if packages:
         # Create objects that don't exist
@@ -88,16 +90,9 @@ def handle_build(packages, version='', latest=False, built=True):
             versions = []
             for rel in package.releases.all():
                 versions.append(rel.version)
-            if len(versions):
+            if versions:
                 highest_version = sorted(versions)[-1]
-                if package.releases.filter(version=highest_version, built=built).exists():
-                    build.delay(project=package.name, version=highest_version)
-                else:
-                    print(
-                        'Latest version package already built: {}-{}'.format(
-                            package, highest_version
-                        )
-                    )
+                build.delay(project=package.name, version=highest_version)
             else:
                 print("No versions; {}".format(package))
 
@@ -223,3 +218,17 @@ def build_changelog(**time_kwargs):
     packages = updated_packages_since(since)
     for package in packages:
         handle_build([package], latest=True, built=False)
+
+
+def update_popular():
+    api_key = getattr(settings, 'LIBRARIES_API_KEY', None)
+    if not api_key:
+        return ()
+    url = 'https://libraries.io/api/search/?platforms=Pypi&sort=rank?api_key={key}'.format(
+        key=api_key,
+    )
+    resp = requests.get(url)
+    data = resp.json()
+    popular = [obj['name'] for obj in data]
+    cache.set('homepage_popular', popular, 3600)
+    return popular

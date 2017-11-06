@@ -4,23 +4,39 @@
 {% block content %}
 {% filter restructuredtext %}
 
-Hello
------
+Welcome to Pydoc
+================
 
 Thanks for checking out Pydoc.
-This is a new ambitious project from the folks behind Read the Docs.
 
-**This is currently in Beta!**
-There is a lot of work that still needs to be done,
-especially around the documentation UX and parsing.
+Below you will find the API documentation for Python packages that have been uploaded to PyPI.
+We currently only support packages uploaded at wheels,
+and that support Python 3.
+This is the future of the ecosystem,
+so we are supporting these formats first because we think they are best practices.
 
-You can read more information in our `About <{% url 'about' %}>`_ page.
+You can find more packages by `searching for them <{% url 'search' %}>`_.
+
+Packages
+--------
 
 So far we have built {{ view.projects.count }} projects.
 
-You can find more packages by `searching for them <{% url 'search' %}>`_.
-These are the latest packages we've built:
+
 {% endfilter %}
+
+<h2> Popular Packages </h2>
+
+{% for release in view.popular|slice:':10' %}
+
+{% filter restructuredtext %}
+
+* `{{ release.release_name }} </pypi/{{ release.release_name }}/index.html>`_
+
+{% endfilter %}
+{% endfor %}
+
+<h2> Recently Built Packages </h2>
 
 {% for release in view.projects|slice:':10' %}
 {% filter restructuredtext %}
@@ -29,4 +45,6 @@ These are the latest packages we've built:
 
 {% endfilter %}
 {% endfor %}
+
+
 {% endblock content %}

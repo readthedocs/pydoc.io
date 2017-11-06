@@ -4,11 +4,8 @@ Thanks to all those who contributed.
 """
 
 import xmlrpc
-import datetime
-import time
 
 from django.db import models
-from django.utils.datastructures import MultiValueDict
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.postgres.fields import JSONField
 
@@ -111,8 +108,8 @@ class Release(models.Model):
         verbose_name = _(u"release")
         verbose_name_plural = _(u"releases")
         unique_together = ("package", "version")
-        get_latest_by = 'created'
-        ordering = ['-created']
+        get_latest_by = 'distributions__uploaded_at'
+        ordering = ['-distributions__uploaded_at']
 
     def __str__(self):
         return self.release_name
@@ -190,5 +187,4 @@ class Distribution(models.Model):
     def path(self):
         if self.file:
             return self.file.url
-        else:
-            return self.url
+        return self.url

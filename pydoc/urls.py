@@ -45,7 +45,7 @@ if settings.DEBUG:
         url(r'^500/$', default_views.server_error),
     ]
     if 'debug_toolbar' in settings.INSTALLED_APPS:
-        import debug_toolbar
+        import debug_toolbar  # noqa
 
         urlpatterns += [
             url(r'^__debug__/', include(debug_toolbar.urls)),

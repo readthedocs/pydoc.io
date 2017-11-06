@@ -16,9 +16,12 @@ release = version
 
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-html_theme_options {
+html_theme_options = {
     'analytics_id':  'UA-17997319-4',
 }
+
+# Don't show module names in docs
+add_module_names = False
 
 # Extensions 
 
@@ -34,6 +37,7 @@ autoapi_type = 'python'
 autoapi_file_pattern = '*.py'
 autoapi_ignore = ['packages*', 'vendor*']
 autoapi_dirs = {{ autoapi_dirs|safe }}
+autoapi_add_api_root_toctree = True
 
 # Standard stuff
 
@@ -44,4 +48,11 @@ copyright = u'2016'
 
 html_context = {
     'output_directory': '{{ output_directory }}',
+    'analytics_code' = 'UA-17997319-4',
+    'user_analytics_code' = 'UA-17997319-4',
+    'versions': [
+    {% for release in releases %}
+    ("{{ release.version }}", "/pypi/{{ release.release_name }}/index.html"),
+    {% endfor %}
+    ],
 }
