@@ -92,14 +92,7 @@ def handle_build(packages, version='', latest=False, built=True):
                 versions.append(rel.version)
             if len(versions):
                 highest_version = sorted(versions)[-1]
-                if package.releases.filter(version=highest_version, built=built).exists():
-                    build.delay(project=package.name, version=highest_version)
-                else:
-                    print(
-                        'Latest version package already built: {}-{}'.format(
-                            package, highest_version
-                        )
-                    )
+                build.delay(project=package.name, version=highest_version)
             else:
                 print("No versions; {}".format(package))
 
