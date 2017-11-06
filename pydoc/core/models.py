@@ -70,7 +70,7 @@ class Package(models.Model):
         verbose_name = _(u"package")
         verbose_name_plural = _(u"packages")
         get_latest_by = "releases__latest"
-        ordering = ['name', ]
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -109,7 +109,7 @@ class Release(models.Model):
         verbose_name_plural = _(u"releases")
         unique_together = ("package", "version")
         get_latest_by = 'distributions__uploaded_at'
-        ordering = ['-distributions__uploaded_at']
+        ordering = ['-created']
 
     def __str__(self):
         return self.release_name
