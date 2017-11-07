@@ -96,7 +96,7 @@ def build(project, version=None):
     release = Release.objects.get(package__name=project, version=version)
     releases = Release.objects.filter(package__name=project, built=True)
     try:
-        dist = release.distributions.get(filetype='bdist_wheel')
+        dist = release.distributions.filter(filetype='bdist_wheel').first()
         project_url = dist.url
         project_filename = dist.filename
     except Exception:
